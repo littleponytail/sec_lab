@@ -1,0 +1,112 @@
+#include<iostream>
+#include<iomanip>
+#include<string>
+using namespace std;
+
+
+class ctask {
+	static int default_id;
+
+public:
+	ctask() {
+		default_id++;
+		this->id = default_id;
+		this->name = "task";
+		this->rate = 0.0;
+	}
+	ctask(string nname) {
+		default_id++;
+		name = nname;
+		this->id = default_id;
+		rate = 0.0;
+
+	}
+	friend class cchecker;
+	friend void print(ctask task, int head);
+	void getname(string name) {
+		this->name = name;
+	};
+
+private:
+	int id;
+	string name;
+	float rate;
+
+public: ~ctask() {
+	cout << "I created it" << endl;
+}
+};
+
+
+void print(ctask task, int head) {
+	if (head == 0)cout << "ID" << setw(20) << "NAME" << setw(10) << "Rate" << endl;
+	cout << task.id << setw(20) << task.name << setw(10) << task.rate << endl;
+}
+
+
+int ctask::default_id = 0;
+
+class cchecker {
+public:
+	void getrate(float currentrate, ctask& student) {
+		if (currentrate >= 0 && currentrate <= 10) student.rate = currentrate;
+		else cout << "Uncorrect rate" << endl;
+	};
+};
+
+int main() {
+	int menu = 1;
+	ctask* tasks;
+	string name;
+	cchecker checker;
+	int tasks_amount = 0, comand_number;
+	cout << "How many tasks would you like to create? Dafault amount is one " << endl;
+	cin >> tasks_amount;
+	if (tasks_amount < 1)tasks_amount = 1;
+	tasks = new ctask[tasks_amount];
+	for (int i = 0; i < tasks_amount; i++) {
+		cout << "Would you like to add name of task number " << i + 1 << " 1- yes" << endl;
+		int name_com;
+		cin >> name_com;
+		if (name_com == 1) {
+			cout << "Enter name " << endl;
+			cin >> name;
+			tasks[i].getname(name);
+		}
+	}
+	while (menu) {
+		cout << "What would you like to do? (1-set task`s rate(available only for checker), 2- print information about the task, 3- print information about all tasks, something else-exit" << endl;
+		cin >> comand_number;
+		switch (comand_number) {
+		case 1: {
+			cout << "Enter task`s id" << endl;
+			int tasks_id;
+			cin >> tasks_id;
+			if (tasks_id < 1 || tasks_id > tasks_amount) { cout << "Task is not founded " << endl; }
+			else {
+				float rate;
+				cout << "Enter rate " << endl;
+				cin >> rate;
+				checker.getrate(rate, tasks[tasks_id - 1]);
+			}
+
+			break;
+		}
+		case 2: {
+			int tasks_id;
+			cout << "Enter task`s id" << endl;
+			cin >> tasks_id;
+			if (tasks_id > tasks_amount || tasks_id < 1) cout << "Task is not founded " << endl;
+			else { print(tasks[tasks_id - 1], 0); }
+			break;
+		}
+		case 3: {
+			for (int i = 0; i < tasks_amount; i++) print(tasks[i], i);
+			break; }
+
+		default: menu = 0;
+			break;
+		}
+	}
+	delete[] tasks;
+}
