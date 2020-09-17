@@ -1,0 +1,199 @@
+#include<iostream>
+using namespace std;
+template <typename T>
+T get_num(T type) {
+	T num;
+	while (true) {
+		cin >> num;
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(32767, '\n');
+			cout << " This input is invalid. Enter once again" << endl;
+		}
+		else {
+			cin.ignore(32767, '\n');
+			return num;
+		}
+	}
+};
+class carray {
+	private:
+	int size;
+	double *array;
+    public:
+	carray(){};
+	carray(int size) {
+		this->size = size;
+		for (int i = 0; i < size; i++) array[i] = 0.0;
+	}
+	carray(const carray& other) {
+		this->size = other.size;
+		this->array = new double[other.size];
+		for (int i = 0; i < other.size; i++)this->array[i] = other.array[i];
+	}
+	void operator =(const carray& other) {
+		this->size = other.size;
+		this->array = new double[this->size];
+		for (int i = 0; i < this->size; i++)
+			this->array[i] = other.array[i];
+	}
+	double& operator () (int i) {
+		return this->array[i];
+	}
+	friend void operator --(carray&);
+	void quick_sort(int left, int right) {
+		double temp, mid;
+		int l, r, lr;
+		l = left;
+		r = right;
+		lr = (left + right)/2;
+		mid = array[lr];
+		do {
+			while (this->array[l] > mid) l++;
+			while (this->array[r] < mid) r--;
+			if (l<=r) {
+				temp = array[l];
+				this->array[l] = array[r];
+				this->array[r] = temp;
+				r--; l++;
+			}
+
+		} while (l <= r);
+		if (l < right)quick_sort(l, right);
+		if (r > left)quick_sort(left, r);
+	}
+	void setsize(int cursize) {
+		this->size = cursize;
+		this->array = new double[size];
+		for (int i = 0; i < size; i++) array[i] = 0.0;
+	}
+	int getsize() {
+		return size;
+	}
+	void setarrayelement(double number, int i) {
+		this->array[i] = number;
+	}
+	void output() {
+		for (int i = 0; i < size; i++)
+			cout << array[i] << " ";
+	}
+	~carray() {
+		delete[]this->array;
+	}
+};
+void operator --(carray &array1) {
+	double* temp;
+	if (array1.size == 1) { array1 = NULL; array1.size = 0; }
+	else if (array1.size != 0) {
+		temp = new double[array1.size - 1];
+		for (int i = 0; i < array1.size - 1; i++) temp[i] = array1.array[i];
+		delete[] array1.array;
+		array1.size--;
+		array1.array = temp;
+	}
+	else cout << "Cannot delete " << endl;
+}
+int main() {
+	int menu = 1;
+	int first_size;
+	carray* arrays, array1, copy_array1;
+	do {
+		cout << "Enter the size of added array  " << endl;
+		first_size = get_num(0);
+		if (first_size > 1) break;
+		else cout << "Input is invalid" << endl;
+	} while (1);
+	array1.setsize(first_size);
+	cout << "Would you like to initialize array`s elements  (1- yes, 2- no)" << endl;
+	int name_com;
+	name_com = get_num(0);
+	if (name_com == 1) {
+		for (int j = 0; j < first_size; j++) {
+			double number;
+			cout << "Input number" << endl;
+			number = get_num(0.0);
+			array1.setarrayelement(number, j);
+		}
+	}
+	copy_array1 = array1;
+	array1.output();
+	copy_array1.output();
+	int arrays_amount = 0, comand_number;
+	cout << "How many arrays would you like to create? Dafault amount is one " << endl;
+	arrays_amount = get_num(0);
+	if (arrays_amount < 1)arrays_amount = 1;
+	arrays = new carray[arrays_amount];
+	for (int i = 0; i < arrays_amount; i++) {
+		int size;
+		do {
+			cout << "Enter the size of array number " << i + 1 << endl;
+			size = get_num(0);
+			if (size > 1) break;
+			else cout << "Input is invalid";
+		} while (true);
+		arrays[i].setsize(size);
+		cout << "Would you like to initialize  " << i + 1 << " array`s elements (1- yes, 2- no)" << endl;
+		int name_com;
+		name_com = get_num(0);
+		if (name_com == 1) {
+			for (int j = 0; j < size; j++) {
+				double number;
+				cout << "Input number" << endl;
+				number = get_num(0.0);
+				arrays[i].setarrayelement(number, j);
+			}
+		}
+	}
+	while (menu) {
+		cout << "What would you like to do? (1-sort the array, 2- print the array, 3- print all arrays, 4-sort arrays, 5-reduce the array, something else-exit" << endl;
+		cin >> comand_number;
+		switch (comand_number) {
+		case 1: {
+			cout << "Enter number of the array" << endl;
+			int arrays_num;
+			arrays_num = get_num(0);
+			if (arrays_num < 1 || arrays_num > arrays_amount) { cout << "Array is not founded " << endl; }
+			else {
+				int right=arrays[arrays_num-1].getsize()-1;
+				arrays[arrays_num-1].quick_sort(0, right);
+			}
+			break;
+		}
+		case 2: {
+			cout << "Enter number of the array" << endl;
+			int arrays_num;
+			arrays_num = get_num(0);
+			if (arrays_num < 1 || arrays_num > arrays_amount) { cout << "Array is not founded " << endl; }
+			else {
+				arrays[arrays_num - 1].output();
+			}
+			break;
+		}
+		case 3: {
+			for (int i = 0; i < arrays_amount; i++) {
+				cout << "Array number " << i + 1 << " ";
+				arrays[i].output();
+			}
+			break; }
+		case 4: {
+			for (int i = 0; i < arrays_amount; i++) {
+				arrays[i].quick_sort(0, arrays[i].getsize()-1);
+			}
+			break;
+		}
+		case 5: {cout << "Enter number of the array" << endl;
+			int arrays_num;
+			arrays_num = get_num(0);
+			if (arrays_num < 1 || arrays_num > arrays_amount) { cout << "Array is not founded " << endl; }
+			else {
+				--arrays[arrays_num-1];
+			}
+			break; }
+		default: menu = 0;
+			break;
+		}
+		
+    
+	}
+	delete[] arrays;
+}
