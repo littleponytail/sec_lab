@@ -1,0 +1,226 @@
+#include<iostream>
+#include<string>
+#include<iomanip>
+using namespace std;
+
+class human {
+	string name;
+	int age;
+public:
+	human() {
+		name = "FIO";
+		age = 0;
+	};
+	human(string name, int age) {
+		this->name = name;
+		this->age = age;
+	}
+	void set_name(string name) {
+		this->name = name;
+	}
+	void set_age(int age) {
+		this->age = age;
+	}
+	void output() {
+		cout << "Class human:" << endl<<setw(20) << "Name" << setw(17) << "Age" << setw(5) << endl << name << setw(20) << age << setw(17) << endl;
+	}
+	~human() {};
+};
+class adult: public virtual human {
+	bool married;
+	int children_amount;
+public:
+	adult() : human("FIO", 18) {
+		married = 0;
+		children_amount = 0;
+	};
+	adult(bool married, int children_amount, string name, int age) : human(name, age) {
+		this->married = married;
+		this->children_amount=children_amount;
+	}
+	void set_marraied_info(bool married) {
+		this->married = married;
+	}
+	void set_age(int children_amount) {
+		this->children_amount = children_amount;
+	}
+	void output_adult() {
+		this->output();
+		cout << "Class adult:" << endl << setw(20)<<"Married info" << setw(17) << "Children amount" << endl;
+		married == 0 ? cout<<setw(20) << "Not married"  : cout<< setw(20) << "Married";
+			cout <<setw(17)<< children_amount << endl;
+	}
+	~adult() {};
+};
+class adult_skater:public adult {
+	int experience;
+	float skill;
+public:
+	adult_skater(): adult() {
+		experience = 0;
+		skill = 0.0;
+	};
+	adult_skater(float skill, int experience, bool married, int children_amount, string name, int age):adult(married, children_amount, name, age) {
+		this->skill = skill;
+		this->experience = experience;
+	}
+	void set_experience(int experience) {
+		this->experience = experience;
+	}
+	void set_skill(float skill) {
+		this->skill = skill;
+	}
+	void output_adult_skater() {
+		this->output_adult();
+		cout << "Class adult_skater:" << endl << setw(20)<<"Skill info" << setw(17) << "Experience info" << endl << skill << setw(20) << experience << setw(17) << endl;
+	}
+	~adult_skater() {};
+};
+class sportsman : public virtual human{
+	string sportname;
+	int level;
+public:
+	sportsman(): human() {
+		level = 0;
+		sportname = "Sport";
+	};
+	sportsman(string sportname, int level, string name, int age): human(name, age){
+		this->sportname = sportname;
+		this->level = level;
+	}
+	void set_sportname(string sportname) {
+		this->sportname = sportname;
+	}
+	void set_skill(int level) {
+		this->level = level;
+	}
+	void outputsportsman() {
+		cout << "Class sportsman:" << endl <<setw(20)<< "Sport`s name" << setw(17) << "Level info" << endl << sportname << setw(20) << level << setw(17) << endl;
+	}
+	~sportsman() {};
+};
+class team_member: public sportsman {
+	int team_number;
+	string country;
+
+public:
+	team_member():sportsman() {
+		team_number = 0;
+		country = "Country";
+	}
+	team_member(int team_number, string country, string sportname, int level, string name, int age): sportsman(sportname, level, name, age) {
+		this->team_number = team_number;
+		this->country = country;
+	}
+	void set_sportname(string country) {
+		this->country = country;
+	}
+	void set_skill(int team_number) {
+		this->team_number = team_number;
+	}
+	void outputteam_member() {
+		this->outputsportsman();
+		cout << "Class team_member:" << endl << setw(20)<<"Contry" << setw(17) << "Team number" << endl << country << setw(20) << team_number << setw(17) << endl;
+	}
+	~team_member() {};
+};
+class hockey_player: public adult_skater, public team_member {
+	int goal_number;
+	string suit_size;
+public:
+	hockey_player() : adult_skater(), team_member() {
+		goal_number = 0;
+		suit_size = "S";
+	}
+	hockey_player(int goal_number, string suit_size, float skill, int experience, int team_number, string country, bool married, int children_amount, string sportname, int level, string name, int age) : team_member(team_number, country, sportname, level, name, age), adult_skater(skill, experience, married, children_amount, name, age) {
+		this->goal_number = goal_number;
+		this-> suit_size = suit_size;
+	
+	}
+	void set_suit_size(string suit_size) {
+		this->suit_size = suit_size;
+	}
+	void set_goal_number(int goal_number) {
+		this->goal_number = goal_number;
+	}
+	void outputhockey_player() {
+		output_adult_skater();
+		outputteam_member();
+		cout << "Class hockey player:" << endl << setw(20)<<"Goal number" << setw(17) << "Suit size" <<  endl << goal_number << setw(20) << suit_size << setw(17) << endl;
+	}
+	~hockey_player() {};
+};
+int get_int();
+float get_float();
+int main() {
+	hockey_player Denis;
+	Denis.outputhockey_player();
+	int goal_number; string suit_size; float skill; int experience; int team_number; string country; bool married; int children_amount; int level; int age;
+	cout << "Input Karl`s goal number " << endl;
+	goal_number = get_int();
+	cout << "Input Karl`s suit size" << endl;
+	cin >> suit_size;
+	cout << "Input Karl`s skater skill(from 0 to 1) " << endl;
+	skill = get_float();
+	cout << "Input Karl`s skater yaers of experience " << endl;
+	experience = get_int();
+	cout << "Input Karl`s team number " << endl;
+	team_number = get_int();
+	cout << "Input Karl`s team country" << endl;
+	cin >> country;
+	cout << "Is Karl married? (0-no, 1-yes) " << endl;
+	do {
+		children_amount = get_int();
+		if (children_amount == 0 || children_amount == 1)break;
+		else cout << "Oh no, try once again " << endl;
+	}while (1);
+	married = children_amount;
+	cout << "Input Karl`s children amount" << endl;
+	children_amount = get_int();
+	cout << "Input Karl`s hockey level (from 0 to 10)" << endl;
+	do { level = get_int();
+	if (level < 10)break;
+	else cout << "Oh no, try once again " << endl;
+	} while (true);
+	cout << "Sorry, but Karl`s name is Karl" << endl;
+	cout << "Input Karl`s age" << endl;
+	do {
+		age = get_int();
+		if (age< 100&& age>18)break;
+	    else cout << "Sorry, I don`t believe u, try once again " << endl;
+	} while (true);
+	hockey_player Karl(goal_number, suit_size, skill, experience, team_number, country, married, children_amount, "Hockey!", level, "Karl!!!", age);
+	Karl.set_name("Karl!!!");
+	Karl.set_age(age);
+	Karl.outputhockey_player();
+}
+int get_int() {
+	int perem;
+	while (true) {
+		cin >> perem;
+		if (cin.fail()|| perem<0) {
+			cin.clear();
+			cin.ignore(32767, '\n');
+			cout << " This input is invalid. Enter once again" << endl;
+		}
+		else {
+			cin.ignore(32767, '\n');
+			return perem;
+		}
+	}
+};
+float get_float () {
+	float perem;
+	while (true) {
+		cin >> perem;
+		if (cin.fail() || perem< 0 || perem>1) {
+			cin.clear();
+			cin.ignore(32767, '\n');
+			cout << " This input is invalid. Enter once again" << endl;
+		}
+		else {
+			cin.ignore(32767, '\n');
+			return perem;
+		}
+	}
+};
