@@ -1,0 +1,221 @@
+#include<iostream>
+#include<iomanip>
+#include<string>
+template <typename T>
+int bin_search(T* array, T searched_element, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/);
+int bin_search(std::string* array, std::string searched_element, int left, int right, bool type);
+template <typename T>
+void quick_sort(T* array, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/);
+void quick_sort(std:: string* array, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/);
+template<typename T>
+void inicialisation(T* array, int size) {
+	for (int i = 0; i < size; i++) {
+		std::cout << "Input element number " << i + 1 << ": " << std::endl;
+		T num;
+		bool exit = 0;
+		while (!exit) {
+			std::cin >> num;
+			if (std::cin.fail()) {
+				std:: cin.clear();
+				std::cin.ignore(32767, '\n');
+				std::cout << " This input is invalid. Enter once again" << std::endl;
+			}
+			else {
+			std::	cin.ignore(32767, '\n');
+				exit = 1;
+			}
+		}
+		array[i] = num;
+	}
+}
+template<typename T>
+void print(T* array, int size) { for (int i = 0; i < size; i++) std::cout << array[i] << "    "; };
+int get_int();
+int main() {
+	int result;
+	bool type_of_sorting;
+	int type_of_array, array_size;
+	float* farray; int* iarray; char* carray; std::string* sarray;
+	std::cout << "Enter int array size "<< std::endl;
+	array_size = get_int();
+	try { iarray = new int[array_size]; }
+	catch(std::bad_alloc){
+		return -1;
+	}
+	inicialisation(iarray, array_size);
+	std::cout << "what type of sorting? 0-vozrastanie, 1-ybuvanie ";
+	type_of_sorting = get_int();
+	if (type_of_sorting != 0 && type_of_sorting != 1)	 return -2;
+	quick_sort(iarray, 0, array_size - 1, type_of_sorting);
+	print(iarray, array_size);
+	std::cout << "Input searched element ";
+	int searched_element = get_int();
+	std::cout << "Number in array is " << bin_search(iarray, searched_element, 0, array_size - 1, type_of_sorting)<<std::endl;
+	std::cout << "Enter float array size " << std::endl;
+	do { array_size = get_int(); if (array_size > 0)break; } while (true);
+	try { farray = new float[array_size]; }
+	catch (std::bad_alloc) {
+		delete[]iarray;
+		return -1;
+	}
+	inicialisation(farray, array_size);
+	std::cout << "what type of sorting? 0-vozrastanie, 1-ybuvanie ";
+	type_of_sorting = get_int();
+	if (type_of_sorting != 0 && type_of_sorting != 1)	 return -2;
+	quick_sort(farray, 0, array_size - 1, type_of_sorting);
+	print(farray, array_size);
+	std::cout << "Input searched element ";
+	float searched_element_float;
+	std::cin >> searched_element_float;
+	std::cin.ignore(32767, '\n');
+	std::cout << "Number in array is " << bin_search(farray, searched_element_float, 0, array_size - 1, type_of_sorting);
+	std::cout << "Enter char array size " << std::endl;
+	do { array_size = get_int(); if (array_size > 0)break; } while (true);
+	try { carray = new char[array_size]; }
+	catch (std::bad_alloc) {
+		delete[]iarray;
+		delete[]farray;
+		return -1;
+	}
+	inicialisation(carray, array_size);
+	std::cout << "what type of sorting? 0-vozrastanie, 1-ybuvanie ";
+	type_of_sorting = get_int();
+	if (type_of_sorting != 0 && type_of_sorting != 1)	 return -2;
+	quick_sort(carray, 0, array_size - 1, type_of_sorting);
+	print(carray, array_size);
+	std::cout << "Input searched element ";
+	char searched_element_char;
+	std::cin >> searched_element_char;
+	std::cin.ignore(32767, '\n');
+	std::cout << "Number in array is " << bin_search(carray, searched_element_char, 0, array_size - 1, type_of_sorting);
+	std::cout << "Enter string array size " << std::endl;
+	do { array_size = get_int(); if (array_size > 0)break; } while (true);
+	try { sarray = new std::string[array_size]; }
+	catch (std::bad_alloc) {
+	delete[]iarray;
+		delete[]farray;
+		delete[]carray;
+		return -1;
+	}
+	inicialisation(sarray, array_size);
+	std::cout << "what type of sorting? 0-vozrastanie, 1-ybuvanie ";
+	type_of_sorting = get_int();
+	if (type_of_sorting != 0 && type_of_sorting != 1)	 return -2;
+	quick_sort(sarray, 0, array_size - 1, type_of_sorting);
+	print(sarray, array_size);
+	std::cout << "Input searched element ";
+	std::string searched_element_string;
+	std::cin >> searched_element_string;
+	std::cout << "Number in array is " << bin_search(sarray, searched_element_string, 0, array_size - 1, type_of_sorting);
+	delete[]iarray;
+	delete[]farray;
+	delete[]carray;
+	delete[]sarray;
+}
+int get_int() {
+	int perem;
+	while (true) {
+		std::cin >> perem;
+		if (std::cin.fail()) {
+			std:: cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << " This input is invalid. Enter once again" << std::endl;
+		}
+		else {
+			std:: cin.ignore(32767, '\n');
+			return perem;
+		}
+	}
+};
+template <typename T>
+int bin_search(T* array, T searched_element, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/) {
+	int lr = (left + right) / 2;
+	if (array[lr] == searched_element)return lr;
+	else if (right <= left|| left==lr) {
+		std::cout << "Your element isn`t founded." << std::endl;
+		return -1;
+	}
+	else if (array[lr] > searched_element) {
+		if (type)bin_search(array, searched_element, lr+1, right,type);
+		else bin_search(array, searched_element, left, lr-1, type);
+	}
+	else if (array[lr] < searched_element) {
+		if (type)bin_search(array, searched_element, left, lr-1, type);
+		else if(!type)bin_search(array, searched_element, lr+1, right, type);
+	}
+}
+template <typename T>
+void quick_sort(T* array, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/) {
+	T temp, mid;
+	int l, r, lr, com;
+	l = left;
+	r = right;
+	lr = (left + right) / 2;
+	mid = array[lr];
+	do {
+		if (type)
+		{
+			while (array[l] > mid) l++;
+			while (array[r] < mid) r--;
+		}
+		else {
+			while (array[l] < mid) l++;
+			while (array[r] > mid) r--;
+		}
+		if (l <= r) {
+			temp = array[l];
+			array[l] = array[r];
+			array[r] = temp;
+			r--; l++;
+		}
+
+	} while (l <= r);
+	if (l < right)quick_sort(array, l, right, type);
+	if (r > left)quick_sort(array, left, r, type);
+}
+void quick_sort(std::string * array, int left, int right, bool type /*0-vozrastanie, 1-ybuvanie*/) {
+	std::string temp, mid;
+	int l, r, lr, com;
+	l = left;
+	r = right;
+	lr = (left + right) / 2;
+	mid = array[lr];
+	do {
+		if (type)
+		{
+			while (array[l] > mid) l++;
+			while (array[r] < mid) r--;
+		}
+		else {
+			while (array[l] < mid) l++;
+			while (array[r] > mid) r--;
+		}
+		if (l <= r) {
+			temp = array[l];
+			array[l] = array[r];
+			array[r] = temp;
+			r--; l++;
+		}
+
+	} while (l <= r);
+	if (l < right)quick_sort(array, l, right, type);
+	if (r > left)quick_sort(array, left, r, type);
+}
+using namespace std;
+int bin_search(string* array, string searched_element, int left, int right, bool type) {
+	static int lr;
+	lr= (left + right) / 2;
+	if (array[lr] == searched_element) { cout <<"Number in array is "<< lr<< std::endl;  return lr; }
+	else if (right <= left) {
+	    cout << "Your element isn`t founded." << std::endl;
+		return -1;
+	}
+	else if (array[lr] > searched_element) {
+		if (type)bin_search(array,searched_element, lr+1, right, type);
+		else bin_search(array, searched_element, left, lr-1, type);
+	}
+	else if (array[lr] < searched_element) {
+		if (type)bin_search(array, searched_element, left, lr-1, type);
+		else bin_search(array, searched_element, lr+1, right, type);
+	}
+}
