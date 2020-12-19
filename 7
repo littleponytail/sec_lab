@@ -10,6 +10,7 @@ private:
 	string name;
 	float rate;
 public:
+
 	ctask(string name, float rate) 
 	{
 		default_id++;
@@ -17,34 +18,35 @@ public:
 		this->name = name;
 		this->rate = rate;
 	}
+
 	ctask()
 	{
-		
 		default_id++;
 		id = default_id;
 		name = "Task";
 		rate=0.0;
 	}
+
 	ctask(string nname) {
 		default_id++;
 		name = nname;
 		this->id = default_id;
 		rate = 0.0;
-
 	}
 	
 	void output(){cout << "\nId - " << id << "\nName - " << name << "\nRate - " << rate << endl;}
-	bool operator< (ctask& c2) {
-		if (name.length() > c2.name.length())return false;
-		for (int i = 0; i < c2.name.length(); i++)
-		{if (name[i] > c2.name[i])  return false; }
-		return true;
+
+	bool operator< (ctask& c2) const
+	{
+		if (name < c2.name)   return true;
+		else return false;
 	}
-	bool operator> (ctask& c2) {
-		if (name.length() < c2.name.length()) return false;
-		for (int i = 0; i < c2.name.length(); i++){if ( name[i] < c2.name[i] )  return false; }
-		return true;
+	bool operator> (ctask& c2) const
+	{
+		if (name > c2.name)   return true;
+		else return false;
 	}
+
 	bool operator== (ctask& c2) {
 		for (int i = 0; i < c2.name.length(); i++)
 		{
@@ -52,6 +54,7 @@ public:
 		}
 		return true;
 	}
+
 	friend ostream& operator<<(ostream& out, const ctask c);
 };
 int ctask::default_id = 0;
@@ -81,9 +84,9 @@ class  Node
 {
 public:
 	T data;
-	Node* next;
-	Node() : data(), next(nullptr) { }
-	Node(T d) : data(d), next(nullptr) { }
+	Node* nexta;
+	Node() : data(), nexta(nullptr) { }
+	Node(T d) : data(d), nexta(nullptr) { }
 };
 
 
@@ -95,12 +98,12 @@ private:
 	int size;
 public:
 	Ring() :head(nullptr), size(0) {}
-	void push(T x)
+	void add(T x)
 	{
 		if (head == nullptr){
 			Node<T>* element = new Node<T>(x);
 			head = new Node<T>(x);
-			element->next = head;
+			element->nexta = head;
 			head = element;
 			size++;
 		}
@@ -108,39 +111,39 @@ public:
 		{
 			Node<T>* tmp = head;
 			int i = 0;
-			while (i < size - 1){tmp = tmp->next;i++;}
-			tmp->next = new Node<T>(x);
-			tmp->next->next = head;
+			while (i < size - 1){tmp = tmp->nexta;i++;}
+			tmp->nexta = new Node<T>(x);
+			tmp->nexta->nexta = head;
 			size++;
 		}
 	}
-	void pop()
+	void mydelete()
 	{
 		if (size == 0)
 			throw Exception();
 		Node<T>* tmp = head;
-		head = head->next;
+		head = head->nexta;
 		delete tmp;
 		size--;
 		Node<T>* t = head;
 		int i = 0;
 		while (i < size - 1)
 		{
-			t = t->next;
+			t = t->nexta;
 			i++;
 		}
-		t->next = head;
+		t->nexta = head;
 	}
 	void output()
 	{
 		if (size == 0)
 			throw Exception();
-		Node<T>* tmp = head;
+		Node<T>* temp = head;
 		int i = 0;
 		while (i < size)
 		{
-			cout << "   " << tmp->data;
-			tmp = tmp->next;
+			cout << "   " << temp->data;
+			temp = temp->nexta;
 			i++;
 		}
 	}
@@ -173,10 +176,10 @@ public:
 			throw Exception();
 		if (current != 0)
 		{
-			while (current < size)
+			while (current < size-1)
 			{
 				current++;
-				node = node->next;
+				node = node->nexta;
 			}
 			current = 0;
 		}
@@ -198,7 +201,7 @@ public:
 				current = 0;
 			else
 				current++;
-			node = node->next;
+			node = node->nexta;
 			i++;
 		}
 		cout << "\n Nothing was founded" << endl;
@@ -211,7 +214,7 @@ public:
 			current = 0;
 		else
 			current++;
-		node = node->next;
+		node = node->nexta;
 		return *this;
 	}
 	T operator*() {
@@ -235,7 +238,7 @@ public:
 				node = tmp;
 				return *this;
 			}
-			tmp = tmp->next;
+			tmp = tmp->nexta;
 			if (current == size - 1)
 				current = 0;
 			else
@@ -268,18 +271,18 @@ int main()
 	Ring<ctask> ring;
 	try
 	{
-		ring.pop();
+		ring.mydelete();
 	}
 	catch (Exception)
 	{
 		cerr << "\nThe ring is empty\n";
 	}
 
-	ring.push(ctask("First task", 3.4));
-	ring.push(ctask("Second task", 5.6));
-	ring.push(ctask("Third task", 7.8));
-	ring.push(ctask("Fourth task", 9.8));
-	ring.push(ctask("Fifth task", 5.0));
+	ring.add(ctask("First task", 3.4));
+	ring.add(ctask("Second task", 5.6));
+	ring.add(ctask("Third task", 7.8));
+	ring.add(ctask("Fourth task", 9.8));
+	ring.add(ctask("Fifth task", 5.0));
 	try
 	{
 		ring.output();
@@ -293,11 +296,11 @@ int main()
 
 		cout << "\nAfter deleting the first" << endl;
 	
-		ring.pop();
+		ring.mydelete();
 		ring.output();
 	
 		cout << "\nAfter deleting the first" << endl;
-		ring.pop();
+		ring.mydelete();
 		ring.output();
 		
 		I.begin();
