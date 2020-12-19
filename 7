@@ -1,0 +1,317 @@
+#include <iostream>
+#include<string>
+using namespace std;
+
+class ctask
+{
+private:
+	static int default_id;
+    int id;
+	string name;
+	float rate;
+public:
+	ctask(string name, float rate) 
+	{
+		default_id++;
+		this->id = default_id;
+		this->name = name;
+		this->rate = rate;
+	}
+	ctask()
+	{
+		
+		default_id++;
+		id = default_id;
+		name = "Task";
+		rate=0.0;
+	}
+	ctask(string nname) {
+		default_id++;
+		name = nname;
+		this->id = default_id;
+		rate = 0.0;
+
+	}
+	
+	void output(){cout << "\nId - " << id << "\nName - " << name << "\nRate - " << rate << endl;}
+	bool operator< (ctask& c2) {
+		if (name.length() > c2.name.length())return false;
+		for (int i = 0; i < c2.name.length(); i++)
+		{if (name[i] > c2.name[i])  return false; }
+		return true;
+	}
+	bool operator> (ctask& c2) {
+		if (name.length() < c2.name.length()) return false;
+		for (int i = 0; i < c2.name.length(); i++){if ( name[i] < c2.name[i] )  return false; }
+		return true;
+	}
+	bool operator== (ctask& c2) {
+		for (int i = 0; i < c2.name.length(); i++)
+		{
+			if (name[i] != c2.name[i] || name.length() != c2.name.length()) { return false;}
+		}
+		return true;
+	}
+	friend ostream& operator<<(ostream& out, const ctask c);
+};
+int ctask::default_id = 0;
+ostream& operator<<(ostream& out, const ctask c){cout << "\nId - " << c.id << "\nName - " << c.name << "\nRate - " << c.rate << endl;
+return out;
+}
+
+class Exception
+{
+};
+
+
+void my_terminate()
+{
+	cerr << "\nTerminate handler called" << endl;
+	abort();
+}
+void my_unexpected()
+{
+	cerr << "\nUnexpected exception" << endl;
+	terminate();
+}
+
+
+template <typename T>
+class  Node
+{
+public:
+	T data;
+	Node* next;
+	Node() : data(), next(nullptr) { }
+	Node(T d) : data(d), next(nullptr) { }
+};
+
+
+template<class T>
+class Ring
+{
+private:
+	Node<T>* head;
+	int size;
+public:
+	Ring() :head(nullptr), size(0) {}
+	void push(T x)
+	{
+		if (head == nullptr){
+			Node<T>* element = new Node<T>(x);
+			head = new Node<T>(x);
+			element->next = head;
+			head = element;
+			size++;
+		}
+		else
+		{
+			Node<T>* tmp = head;
+			int i = 0;
+			while (i < size - 1){tmp = tmp->next;i++;}
+			tmp->next = new Node<T>(x);
+			tmp->next->next = head;
+			size++;
+		}
+	}
+	void pop()
+	{
+		if (size == 0)
+			throw Exception();
+		Node<T>* tmp = head;
+		head = head->next;
+		delete tmp;
+		size--;
+		Node<T>* t = head;
+		int i = 0;
+		while (i < size - 1)
+		{
+			t = t->next;
+			i++;
+		}
+		t->next = head;
+	}
+	void output()
+	{
+		if (size == 0)
+			throw Exception();
+		Node<T>* tmp = head;
+		int i = 0;
+		while (i < size)
+		{
+			cout << "   " << tmp->data;
+			tmp = tmp->next;
+			i++;
+		}
+	}
+	Node<T>* get_node() {
+		return head;
+	}
+	int get_size() {
+		return size;
+	}
+
+};
+
+template<class T>
+class Iterator
+{
+private:
+	Node<T>* node;
+	int size;
+	int current;
+public:
+	friend Ring<T>;
+	Iterator(Ring<T>* element) : current(0)
+	{
+		node = element->get_node();
+		size = element->get_size();
+	}
+	void begin()
+	{
+		if (size == 0)
+			throw Exception();
+		if (current != 0)
+		{
+			while (current < size)
+			{
+				current++;
+				node = node->next;
+			}
+			current = 0;
+		}
+
+	}
+	void search(T x)
+	{
+		if (size == 0)
+			throw Exception();
+		int i = 0;
+		while (i < size)
+		{
+			if (x == node->data)
+			{
+				cout << "\nHere it is\n " << node->data <<endl;
+				return;
+			}
+			if (current == size - 1)
+				current = 0;
+			else
+				current++;
+			node = node->next;
+			i++;
+		}
+		cout << "\n Nothing was founded" << endl;
+	}
+	Iterator& operator++()
+	{
+		if (size == 0)
+			throw Exception();
+		if (size == 1)
+			current = 0;
+		else
+			current++;
+		node = node->next;
+		return *this;
+	}
+	T operator*() {
+		return node->data;
+	}
+	void operator = (T x)
+	{
+		if (size == 0)
+			throw Exception();
+		node->data = x;
+	}
+	Iterator& operator[](int index)
+	{
+		if (size == 0)
+			throw Exception();
+		Node<T>* tmp = node;
+		while (1)
+		{
+			if (current == index)
+			{
+				node = tmp;
+				return *this;
+			}
+			tmp = tmp->next;
+			if (current == size - 1)
+				current = 0;
+			else
+				current++;
+		}
+	}
+	void shell()
+	{
+		T tmp;
+		if (size == 0)
+			throw Exception();
+		int step, i, j;
+		for (step = size / 2; step > 0; step /= 2)
+			for (i = step; i < size; i++)
+				for (j = i - step; j >= 0 && (*this)[j].node->data > (*this)[j + step].node->data; j -= step)
+				{
+					tmp = (*this)[j].node->data;
+					(*this)[j].node->data = (*this)[j + step].node->data;
+					(*this)[j + step].node->data = tmp;
+				}
+	}
+};
+
+
+
+int main()
+{
+	set_terminate(my_terminate);
+	set_unexpected(my_unexpected);
+	Ring<ctask> ring;
+	try
+	{
+		ring.pop();
+	}
+	catch (Exception)
+	{
+		cerr << "\nThe ring is empty\n";
+	}
+
+	ring.push(ctask("First task", 3.4));
+	ring.push(ctask("Second task", 5.6));
+	ring.push(ctask("Third task", 7.8));
+	ring.push(ctask("Fourth task", 9.8));
+	ring.push(ctask("Fifth task", 5.0));
+	try
+	{
+		ring.output();
+	
+		Iterator<ctask> I(&ring);
+		cout << "\nAfter sorting"  << endl;
+
+		I.begin();
+		I.shell();
+		ring.output();
+
+		cout << "\nAfter deleting the first" << endl;
+	
+		ring.pop();
+		ring.output();
+	
+		cout << "\nAfter deleting the first" << endl;
+		ring.pop();
+		ring.output();
+		
+		I.begin();
+		string name;
+		cout << "find watt? Input name of the task"<<endl;
+		getline(cin, name);
+		I.search(ctask(name));
+		cout << "find watt? Input name of the task"<<endl;
+		getline(cin, name);
+		I.search(ctask(name));
+	}
+	catch (Exception)
+	{
+		cerr << "\nThe ring is empty\n";
+	}
+
+}
