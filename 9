@@ -177,35 +177,7 @@ class ctask;
 		file.close();
 	}
 
-	void Algorithm::second_task(std::vector<ctask>::iterator begin, std::vector<ctask>::iterator end) {
-		int i1 = 0;
-		int i2 = 0;
-		while (begin != end) {
-			begin++;
-			if (begin == end) break;
-			i1++;
-			if (*begin >= 80) {
-				i2++;
-			}
-		}
-		if (i1 == i2) {
-			std::cout << "Algorithm 2 True (the elements are >= 80%)" << std::endl;
-		}
-		else {
-			std::cout << "Algorithm 2 False(the elements are not >= 80%)" << std::endl;
-		}
-	}
-	void Algorithm::third_task(std::vector<ctask>::iterator begin, std::vector<ctask>::iterator end) {
-		std::cout << "Algorithm 3 (the elements are >= 80%)" << std::endl;
-		while (begin != end) {
-			if (*begin >= 80) {
-				std::cout << *begin;
-			}
-			begin++;
-			if (begin == end) break;
-		}
-	}
-
+	
 
 
 int main() {
