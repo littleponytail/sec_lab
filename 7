@@ -2,6 +2,38 @@
 #include<string>
 using namespace std;
 
+class Exception
+{
+private:
+	int error;
+
+public:
+	Exception()
+	{
+		error = 0;
+	}
+	Exception(int error)
+	{
+		this->error = error;
+		what();
+	}
+	void what()
+	{
+		if (error == 1)
+		{
+			std::cout << "Ring iz empty" << std::endl;
+		}
+		if (error == 2)
+		{
+			std::cout << "Nophing was founded" << std::endl;
+		}
+		if (error == 3)
+		{
+			std::cout << "pointer is empty" << std::endl;
+		}
+	}
+};
+
 class ctask
 {
 private:
@@ -48,11 +80,8 @@ public:
 	}
 
 	bool operator== (ctask& c2) {
-		for (int i = 0; i < c2.name.length(); i++)
-		{
-			if (name[i] != c2.name[i] || name.length() != c2.name.length()) { return false;}
-		}
-		return true;
+		if (name > c2.name || name < c2.name)return false;
+		else return true;
 	}
 
 	friend ostream& operator<<(ostream& out, const ctask c);
@@ -60,22 +89,6 @@ public:
 int ctask::default_id = 0;
 ostream& operator<<(ostream& out, const ctask c){cout << "\nId - " << c.id << "\nName - " << c.name << "\nRate - " << c.rate << endl;
 return out;
-}
-
-class Exception
-{
-};
-
-
-void my_terminate()
-{
-	cerr << "\nTerminate handler called" << endl;
-	abort();
-}
-void my_unexpected()
-{
-	cerr << "\nUnexpected exception" << endl;
-	terminate();
 }
 
 
@@ -105,7 +118,7 @@ public:
 	Ring() :head(nullptr), size(0) {}
 	void add(T input)
 	{
-		if (head == nullptr){
+		if (head == nullptr) {
 			Node<T>* element = new Node<T>(input);
 			element->setnexta(head);
 			head = element;
@@ -115,29 +128,30 @@ public:
 		{
 			Node<T>* tmp = head;
 			int i = 0;
-			while (i < size-1 ){tmp = tmp->getnexta();i++;}
-			tmp->setnexta (new Node<T>(input));
+			while (i < size - 1) { tmp = tmp->getnexta(); i++; }
+			tmp->setnexta(new Node<T>(input));
 			tmp = tmp->getnexta();
-			tmp->setnexta( head);
+			tmp->setnexta(head);
 			size++;
 		}
 	}
 	void mydelete()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		Node<T>* tmp = head;
-		if(size>1)head = head->getnexta();
-		if (size == 1) { delete tmp; return; }
+		head = head->getnexta();
+		delete tmp;
 		size--;
 		Node<T>* t = head;
 		int i = 0;
-		while (i < size)
+		while (i < size - 1)
 		{
 			t = t->getnexta();
 			i++;
 		}
-		t->setnexta( head);
+		t->setnexta (head);
+
 	}
 	void output()
 	{
@@ -146,6 +160,18 @@ public:
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < size)
+		{
+			cout << "   " << temp->data;
+			temp = temp->getnexta();
+			i++;
+		}
+	}
+	void twice_output() {
+		if (size == 0)
+			throw Exception();
+		Node<T>* temp = head;
+		int i = 0;
+		while (i < 2*size)
 		{
 			cout << "   " << temp->data;
 			temp = temp->getnexta();
@@ -178,7 +204,7 @@ public:
 	void begin()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		if (current != 0)
 		{
 			while (current < size-1)
@@ -193,11 +219,11 @@ public:
 	void search(T searched)
 	{
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		int i = 0;
 		while (i < size)
 		{
-			if (searched == node->data)
+			if (!(searched > node->data) && !(searched < node->data))
 			{
 				cout << "\nHere it is\n " << node->data <<endl;
 				return;
@@ -210,6 +236,7 @@ public:
 			i++;
 		}
 		cout << "\n Nothing was founded" << endl;
+		throw 2;
 	}
 	Iterator& operator++()
 	{
@@ -227,14 +254,13 @@ public:
 	}
 	void operator = (T x)
 	{
-		if (size == 0)
-			throw Exception();
+		if (size == 0) throw 1;
 		node->data = x;
 	}
 	Iterator& operator[](int index)
 	{
-		if (size == 0)
-			throw Exception();
+		if (size == 0) throw 1;
+		if (index > size) throw 3;
 		Node<T>* tmp = node;
 		while (1)
 		{
@@ -271,17 +297,17 @@ public:
 
 int main()
 {
-	set_terminate(my_terminate);
-	set_unexpected(my_unexpected);
+
 	Ring<ctask> ring;
 	try
 	{
 		ring.mydelete();
 	}
-	catch (Exception)
-	{
-		cerr << "\nThe ring is empty\n";
+	catch (int exIndex) {
+		Exception ex(exIndex);
+		ex.what();
 	}
+
 
 	ring.add(ctask("First task", 3.4));
 	ring.add(ctask("Second task", 5.6));
@@ -313,13 +339,20 @@ int main()
 		cout << "find watt? Input name of the task"<<endl;
 		getline(cin, name);
 		I.search(ctask(name));
-		cout << "find watt? Input name of the task"<<endl;
+		cout <<endl << "find watt? Input name of the task"<<endl;
 		getline(cin, name);
 		I.search(ctask(name));
 	}
-	catch (Exception)
-	{
-		cerr << "\nThe ring is empty\n";
+	catch (int exIndex) {
+		Exception ex1(exIndex);
+		ex1.what();
 	}
-
+	try
+	{
+		ring.twice_output();
+	}
+	catch (int exIndex) {
+		Exception ex1(exIndex);
+		ex1.what();
+	}
 }
