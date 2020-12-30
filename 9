@@ -3,6 +3,12 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <list>
+#include <iterator>
+#include <functional>
+#include <set>
+
+
 
 using namespace std;
 class ctask;
@@ -10,9 +16,10 @@ class ctask;
 	{
 	public:
 		void first_task();
-		void second_task(std::vector<ctask>::iterator begin, std::vector<ctask>::iterator end);
-		void third_task(std::vector<ctask>::iterator begin, std::vector<ctask>::iterator end);
+		void second_task(list<ctask>::iterator begin, std::list<ctask>::iterator end);
+		void third_task(list<ctask>::iterator begin, std::list<ctask>::iterator end);
 	};
+
 	class Exception
 	{
 	protected:
@@ -31,16 +38,14 @@ class ctask;
 		{
 			if (this->error == 1)
 			{
-				std::cout << "File isn't open!" << std::endl;
-			}
-			if (this->error == 2)
-			{
-				std::cout << "The vector is empty!" << std::endl;
-			}
-			if (this->error < 1 || this->error > 2)
-			{
-				int time = clock();
-				std::cout << "Error time! " << time << std::endl;
+				cout << "File isn't open!" << endl;
+				if (this->error == 2)
+				{
+					cout << "List is empty!" << endl;
+				}
+				if (error == 3) {
+					cout << "EOF" << endl;
+				}
 			}
 		}
 	};
@@ -51,7 +56,7 @@ class ctask;
 			static int default_id;
 			int id;
 			string name;
-			float rate;
+			int rate;
 		public:
 
 			ctask(string name, float rate)
@@ -104,6 +109,7 @@ class ctask;
 				this->name = n;
 				this->rate = r;
 			}
+			bool set_from_file() {};
 			int cget_id() {
 				return this->id;
 			}
@@ -112,7 +118,7 @@ class ctask;
 				return this->name;
 			}
 
-			float get_rate() {
+			int get_rate() {
 				return this->rate;
 			}
 
@@ -161,83 +167,118 @@ class ctask;
 			else if (c == ')') {
 				fl--;
 			}
-			if (fl < 0 || (c == '\n' && fl != 0)) {
-				fl = 0;
+			if (fl < 0 ) {
 				cout << "wrong brackets" << endl;
-				getline(file, str);
-			}
-			else if (c == '\n') {
-				fl = 0;
-				cout << "correct brackets" << endl;
-				cout << "wrong brackets" << endl;
+				file.close();
+				return;
+
 			}
 		}
-		if (fl==0)	 cout << "wrong brackets" << endl;
-		else 
+		if (fl!=0)	 cout << "wrong brackets" << endl;
+		else cout << "correct brackets" << endl;
 		file.close();
 	}
 
+	void Algorithm::second_task(list<ctask>::iterator begin, list<ctask>::iterator end) {
+		cout << "Algorithm 2 " << endl;
+		int i1 = 0;
+		int i2 = 0;
+		while (begin != end) {
+			if (begin == end) break;
+			if (*begin >= 50) {
+				i2++;
+			}
+			begin++;
+			i1++;
+		}
+		
+	    cout <<i2<< " tasks with rate wich is more than 50" << endl;
+	   cout <<i1-i2<< " tasks with rate wich is less than 50" << endl;
+		
+	}
+	void Algorithm::third_task(list<ctask>::iterator begin, list<ctask>::iterator end) {
+		cout << "Algorithm 3 " << endl;
+		while (begin != end) {
+			if (*begin >= 50) {
+				std::cout << *begin;
+			}
+			begin++;
+			if (begin == end) break;
+		}
+	}
+
+	int main() {
+		Algorithm alg;
+		std::set<ctask> test;
+		std::set<ctask> newTest;
+		std::list<ctask> tasks;
+		std::ifstream file;
+		tasks.push_back(ctask("First_task", 76));
+		tasks.push_back(ctask("Second_task", 97));
+		tasks.push_back(ctask("Third_task", 90));
+		tasks.push_back(ctask("Fourth_task", 75));
+
+		std::cout << "Algoritm 1\n";
+		alg.first_task();
+		std::cout << endl;
+		alg.second_task(tasks.begin(), tasks.end());
+		alg.third_task(tasks.begin(), tasks.end());
 	
-
-
-int main() {
-     Algorithm A;
-	A.first_task();
-	std::ifstream file;
-	file.open("C:\\Users\\master\\Desktop\\kf,s\\T2.txt");
-	try {
-		if (!file.is_open())
-		{
-			throw 1;
+		file.open("C:\\Users\\master\\Desktop\\kf,s\\First.txt");
+		try {
+			if (!file.is_open())
+			{
+				throw 1;
+			}
 		}
-	}
-	catch (int i)
-	{
-		Exception ex(i);
-		ex.Print();
-		return 0;
-	}
-	std::string str1;
-	std::string str2;
-	std::vector<ctask> V;
-	ctask T;
-	char c;
-	while (!file.eof()) {
-		do {
-			file.get(c);
-			str1 += c;
-		} while (c != ' ' && c != '\n');
-		do {
-			file.get(c);
-			str2 += c;
-		} while (c != '\n' && c != ' ');
-		if (file.eof()) break;
-		T.set_information(str1, stof(str2));
-		str1.clear();
-		str2.clear();
-		V.push_back(T);
-	}
-	file.close();
-	try {
-		if (V.size() <= 0)
+		catch (int i)
 		{
-			throw 2;
+			Exception ex(i);
+			ex.Print();
+			return 0;
 		}
-	}
-	catch (int i)
-	{
-		Exception ex(i);
-		ex.Print();
+		string task_name;
+		string task_rate;
+		list<ctask> list;
+		char c;
+		while (!file.eof()) {
+			do {
+				file.get(c);
+				task_name += c;
+			} while (c != ' ' && c != '\n');
+			do {
+				file.get(c);
+				task_rate += c;
+			} while (c != '\n' && c != ' ');
+			if (file.eof()) break;
+			ctask T(task_name, stof(task_rate));
+			task_name.clear();
+			task_rate.clear();
+			list.push_back(T);
+		}
+		file.close();
+		try {
+			if (list.size() <= 0)
+			{
+				throw 2;
+			}
+		}
+		catch (int i)
+		{
+			Exception ex(i);
+			ex.Print();
+			return 0;
+		}
+		std::list<ctask>::iterator It;
+		It = list.begin();
+		cout << endl << "Readed from file" << endl;
+		while (It != list.end())
+		{
+			std::cout << *It;
+			It++;
+		}
+		alg.second_task(It = list.begin(), It = list.end());
+		alg.third_task(It = list.begin(), It = list.end());
 		return 0;
+		
 	}
-	std::vector<ctask>::iterator It;
-	It = V.begin();
-	while (It != V.end())
-	{
-		std::cout << *It;
-		It++;
-	}
-	A.second_task(It = V.begin(), It = V.end());
-	A.third_task(It = V.begin(), It = V.end());
-	return 0;
-}
