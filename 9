@@ -1,12 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <ctime>
 #include <list>
 #include <iterator>
-#include <functional>
-#include <set>
 
 
 
@@ -19,7 +15,8 @@ class ctask;
 		void second_task(list<ctask>::iterator begin, std::list<ctask>::iterator end);
 		void third_task(list<ctask>::iterator begin, std::list<ctask>::iterator end);
 	};
-
+	
+	
 	class Exception
 	{
 	protected:
@@ -34,19 +31,26 @@ class ctask;
 			error = _error;
 		}
 		~Exception() { };
-		void Print()
+		void what()
 		{
 			if (this->error == 1)
 			{
 				cout << "File isn't open!" << endl;
-				if (this->error == 2)
-				{
-					cout << "List is empty!" << endl;
-				}
-				if (error == 3) {
-					cout << "EOF" << endl;
-				}
 			}
+			if (this->error == 2)
+			{
+				cout << "List is empty!" << endl;
+			}
+			if (error == 3) {
+				cout << "EOF" << endl;
+			}
+			if (error == 4) {
+				cout << "Invalid input" << endl;
+			}
+		}
+
+		void check_rerror(int error) {
+			this->error = error;
 		}
 	};
 
@@ -156,7 +160,7 @@ class ctask;
 		catch (int i)
 		{
 			Exception ex(i);
-			ex.Print();
+			ex.what();
 			return;
 		}
 		while (!file.eof()) {
@@ -209,10 +213,9 @@ class ctask;
 
 	int main() {
 		Algorithm alg;
-		std::set<ctask> test;
-		std::set<ctask> newTest;
 		std::list<ctask> tasks;
 		std::ifstream file;
+		Exception ex;
 		tasks.push_back(ctask("First_task", 76));
 		tasks.push_back(ctask("Second_task", 97));
 		tasks.push_back(ctask("Third_task", 90));
@@ -233,25 +236,37 @@ class ctask;
 		}
 		catch (int i)
 		{
-			Exception ex(i);
-			ex.Print();
+			 ex.check_rerror(i);
+			ex.what();
 			return 0;
 		}
 		string task_name;
 		string task_rate;
 		list<ctask> list;
 		char c;
+		int rate = 0;
 		while (!file.eof()) {
-			do {
-				file.get(c);
-				task_name += c;
-			} while (c != ' ' && c != '\n');
-			do {
-				file.get(c);
-				task_rate += c;
-			} while (c != '\n' && c != ' ');
+			try {
+				rate = 0;
+				do {
+					file.get(c);
+					task_name += c;
+				} while (c != ' ' && c != '\n');
+				do {
+					file.get(c);
+					if (c == '\n' || c == ' ') break;
+					if (c > '9' || c< '0')throw 4;
+					rate *= 10;
+					rate += c - '0';
+				} while (true);
+			}
+			catch (int i) {
+				ex.check_rerror(i);
+				ex.what();
+				return 0;
+			}
 			if (file.eof()) break;
-			ctask T(task_name, stof(task_rate));
+			ctask T(task_name, rate);
 			task_name.clear();
 			task_rate.clear();
 			list.push_back(T);
@@ -265,8 +280,8 @@ class ctask;
 		}
 		catch (int i)
 		{
-			Exception ex(i);
-			ex.Print();
+			ex.check_rerror(i);
+			ex.what();
 			return 0;
 		}
 		std::list<ctask>::iterator It;
