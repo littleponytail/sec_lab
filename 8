@@ -3,6 +3,9 @@
 #include <string>
 #include <io.h>
 #include <stdio.h>
+#include <filesystem>
+
+
 
 using namespace std;
 
@@ -10,19 +13,19 @@ class File;
 
 class Competitor {
 	int team_num;
-	std::string name;
+	string name;
 	int age;
 	double weight;
 
 	friend File;
 public:
-	Competitor(std::string name, int articul, int quantuty, double price);
+	Competitor(string name, int articul, int quantuty, double price);
 	Competitor() {};
 	void PrintInfo() {
-		std::cout << "Name: " << name << std::endl;
-		std::cout << "Number: " << team_num << std::endl;
-		std::cout << "Weight: " << weight << std::endl;
-		std::cout << "Age: " << age << std::endl;
+		cout << "Name: " << name << endl;
+		cout << "Number: " << team_num << endl;
+		cout << "Weight: " << weight << endl;
+		cout << "Age: " << age << endl;
 	}
 	bool operator <(Competitor& other) {
 		if (this->team_num < other.team_num) {
@@ -82,20 +85,27 @@ public:
 	{
 		if (error == 1)
 		{
-			std::cout << "Cant insert Dublicate!" << std::endl;
+			cout << "Cant insert Dublicate!" << endl;
 		}
 		if (error == 2)
 		{
-			std::cout << "No such value!" << std::endl;
+			cout << "No such value!" << endl;
 		}
 		if (error == 3)
 		{
-			std::cout << "pointer is empty" << std::endl;
+			cout << "Pointer is empty" <<endl;
 		}
 		if (error == 4)
 		{
-			std::cout << "Can't open such file" << std::endl;
+			cout << "File wasn`t open" << endl;
 		}
+		if (error==5)
+		{
+			cout << "Ring is empty" << endl;
+		}
+	} 	
+	void check_rerror(int error) {
+		this->error = error;
 	}
 };
 
@@ -150,7 +160,7 @@ public:
 	void mydelete()
 	{
 		if (size == 0)
-			throw 1;
+			throw 5;
 		Node<T>* tmp = head;
 		head = head->getnexta();
 		delete tmp;
@@ -168,12 +178,12 @@ public:
 	void output()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 5;
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < size)
 		{
-			std:: cout << "   " << temp->data;
+			cout << "   " << temp->data;
 			temp = temp->getnexta();
 			i++;
 		}
@@ -219,7 +229,7 @@ public:
 			throw 1;
 		if (current != 0)
 		{
-			while (current < size - 1)
+			while (current < size)
 			{
 				current++;
 				node = node->getnexta();
@@ -325,25 +335,26 @@ public:
 };
 
 class File {
+	string path;
+	fstream file;
+	int CountElementOfBinFile();
+	void GetElementOfBinFile(Competitor& comp);
 public:
 	File(std::string filePath);
 	void ReadTextFormat();
-	void WriteTextFormat(const Competitor& shoes);
+	void WriteTextFormat(const Competitor& comp);
 	void ReadBinFormat();
-	void WriteBinFormat(const Competitor& shoes);
-	void SortByPrice();
+	void ReadBinFormat(int);
+	void WriteBinFormat(const Competitor& comp);
+	void sort_weight();
 	void Num_sort();
-	void SortByQuantity();
+	void age_sort();
 	void SortByName();
-	void InfoBeforePrice(double price);
-	void DelByName(std::string name);
-	void FindByName(std::string name);
-
-private:
-	std::string filePath;
-	std::fstream ioFile;
-	int CountElementOfBinFile();
-	void GetElementOfBinFile(Competitor& shoes);
+	void SortByName(string);
+	void InfoBeforePrice(double weight);
+	int DelByName(string name);
+	void FindByName(string name);
+	
 };
 
 int main() {
@@ -351,18 +362,18 @@ int main() {
 	File file2("T2.txt");
 	File file3("B.bin");
 
-	Ring<Competitor> tree;
-	tree.add(Competitor("Andrew", 2, 87, 35));
-	tree.add(Competitor("Nick", 1, 98, 25));
-	tree.add(Competitor("Mike", 1, 89, 30));
-	tree.add(Competitor("Alex", 12,105, 40));
-	tree.add(Competitor("Vova", 13, 100, 40));
+	Ring<Competitor> ring;
+	ring.add(Competitor("Andrew", 2, 87, 35));
+	ring.add(Competitor("Nick", 1, 98, 25));
+	ring.add(Competitor("Mike", 1, 89, 30));
+	ring.add(Competitor("Alex", 12,105, 40));
+	ring.add(Competitor("Vova", 13, 100, 40));
 
-	Iterator<Competitor> it(&tree);
+	Iterator<Competitor> it(&ring);
 	int place = 0;
 	while (1) {
 		place++;
-		if (place==tree.get_size()) {
+		if (place==ring.get_size()) {
 			file1.WriteTextFormat(it.GetValue());
 			break;
 		}
@@ -374,7 +385,7 @@ int main() {
 	place = 0;
 	while (1) {
 		place++;
-		if (place == tree.get_size()) {
+		if (place == ring.get_size()) {
 			file2.WriteBinFormat(it.GetValue());
 			break;
 		}
@@ -386,7 +397,7 @@ int main() {
 	place = 0;
 	while (1) {
 		place++;
-		if (place == tree.get_size()) {
+		if (place == ring.get_size()) {
 			file3.WriteBinFormat(it.GetValue());
 			break;
 		}
@@ -394,59 +405,94 @@ int main() {
 		++it;
 	}
 
-
-	std::cout << "Text File, Text format:\n" << "-------------------------\n";
-	file1.ReadTextFormat();
-	std::cout << "\nText File, bin format:\n" << "-------------------------\n";
-	file2.ReadBinFormat();
+    std::cout << "Text File, Text format:\n" << "-------------------------\n";
+	//file1.ReadTextFormat();
+	//std::cout << "\nText File, bin format:\n" << "-------------------------\n";
+	//file2.ReadBinFormat();
 	std::cout << "Bin File:\n" << "-------------------------\n";
 	file3.ReadBinFormat();
-	file3.SortByName();
+	/*file3.SortByName();
 	std::cout << "Sorted by name:\n" << "-------------------------\n";
 	file3.Num_sort();
 	file3.ReadBinFormat();
 	std::cout << "Sorted by num:\n" << "-------------------------\n";
 	file3.ReadBinFormat();
 	std::cout << "Find by name:\n" << "-------------------------\n";
-	file3.FindByName("Andrew");
+	file3.FindByName("Andrew");*/
+	int size=file3.DelByName("Mike");
+	/*FILE* output;
+	fopen_s(&output, "B.bin", "wb");
+	_chsize(_fileno(output), 122);
+	fclose(output);*/
+	//File file4("B.bin");
+	std::cout << "del:\n" << "-------------------------\n";
+	file3.ReadBinFormat();
 	
 }
 
-/////////////////////									  9
+void File::GetElementOfBinFile(Competitor& temp) {
+	int len, beg;
+	file.read((char*)&temp.team_num, sizeof(int));
+	file.read((char*)&temp.age, sizeof(int));
+	file.read((char*)&temp.weight, sizeof(double));
+	file.read((char*)&len, sizeof(int));
+	char* nam = new char[len + 1];
+	file.read(nam, len);
+	nam[len] = '\0';
+	temp.name = nam;
 
-void File::InfoBeforePrice(double price) {
-	SortByName();
-	int fileSize = CountElementOfBinFile();
+	delete[] nam;
+}
+int File::DelByName(string name) {
+	SortByName(name);
+	int size = 0, size2, size3;
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
 	catch (int index) {
 		Exception ex(index);
 		ex.what();
-		return;
+		return 0;
 	}
-
-	Competitor temp;
-	for (int i = 0; i < fileSize; i++) {
-		GetElementOfBinFile(temp);
-		if (temp.weight < price) {
-			std::cout << temp << std::endl;
-		}
+	file.seekg(0, std::ios::end);
+	int fileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+	Competitor next, next1;
+	
+	GetElementOfBinFile(next);
+	
+	while (file.tellg() < fileSize) {
+		
+		size2 = file.tellg();
+		GetElementOfBinFile(next1);
+		size3 = file.tellg();
+		size++;
 	}
+	/*fopen_s(&output, "B.bin", "wb");
+	_chsize(_fileno(output), 98);
+	fclose(output);*/
+	/*while(file.tellg() < fileSize) {
+	file.write(" ",2);
+	size2++;
+	}*/
+	//write(file, buf, 0);
+	file.close();
 
-	ioFile.close();
+	return size2;
+
+
 }
 
 void File::Num_sort() {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -460,42 +506,42 @@ void File::Num_sort() {
 	int curPos, nextPos;
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
-			curPos = ioFile.tellg();
+			curPos = file.tellg();
 			GetElementOfBinFile(cur);
-			nextPos = ioFile.tellg();
+			nextPos = file.tellg();
 			GetElementOfBinFile(next);
 
 			if (cur.team_num > next.team_num) {
-				ioFile.seekp(curPos, std::ios::beg);
+				file.seekp(curPos, std::ios::beg);
 
-				ioFile.write((char*)&next.team_num, sizeof(int));
-				ioFile.write((char*)&next.age, sizeof(int));
-				ioFile.write((char*)&next.weight, sizeof(double));
+				file.write((char*)&next.team_num, sizeof(int));
+				file.write((char*)&next.age, sizeof(int));
+				file.write((char*)&next.weight, sizeof(double));
 				int len = next.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(next.name.data(), len);
-				nextPos = ioFile.tellp();
+				file.write((char*)&len, sizeof(int));
+				file.write(next.name.data(), len);
+				nextPos = file.tellp();
 
-				ioFile.write((char*)&cur.team_num, sizeof(int));
-				ioFile.write((char*)&cur.age, sizeof(int));
-				ioFile.write((char*)&cur.weight, sizeof(double));
+				file.write((char*)&cur.team_num, sizeof(int));
+				file.write((char*)&cur.age, sizeof(int));
+				file.write((char*)&cur.weight, sizeof(double));
 				len = cur.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(cur.name.data(), len);
+				file.write((char*)&len, sizeof(int));
+				file.write(cur.name.data(), len);
 			}
-			ioFile.seekg(nextPos, std::ios::beg);
+			file.seekg(nextPos, std::ios::beg);
 		}
-		ioFile.seekg(0, std::ios::beg);
+		file.seekg(0, std::ios::beg);
 	}
-	ioFile.close();
+	file.close();
 }
 
-void File::SortByQuantity() {
+void File::age_sort() {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -508,43 +554,43 @@ void File::SortByQuantity() {
 	int curPos, nextPos;
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
-			curPos = ioFile.tellg();
+			curPos = file.tellg();
 			GetElementOfBinFile(cur);
-			nextPos = ioFile.tellg();
+			nextPos = file.tellg();
 			GetElementOfBinFile(next);
 
 
 			if (cur.age > next.age) {
-				ioFile.seekp(curPos, std::ios::beg);
+				file.seekp(curPos, std::ios::beg);
 
-				ioFile.write((char*)&next.team_num, sizeof(int));
-				ioFile.write((char*)&next.age, sizeof(int));
-				ioFile.write((char*)&next.weight, sizeof(double));
+				file.write((char*)&next.team_num, sizeof(int));
+				file.write((char*)&next.age, sizeof(int));
+				file.write((char*)&next.weight, sizeof(double));
 				int len = next.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(next.name.data(), len);
-				nextPos = ioFile.tellp();
+				file.write((char*)&len, sizeof(int));
+				file.write(next.name.data(), len);
+				nextPos = file.tellp();
 
-				ioFile.write((char*)&cur.team_num, sizeof(int));
-				ioFile.write((char*)&cur.age, sizeof(int));
-				ioFile.write((char*)&cur.weight, sizeof(double));
+				file.write((char*)&cur.team_num, sizeof(int));
+				file.write((char*)&cur.age, sizeof(int));
+				file.write((char*)&cur.weight, sizeof(double));
 				len = cur.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(cur.name.data(), len);
+				file.write((char*)&len, sizeof(int));
+				file.write(cur.name.data(), len);
 			}
-			ioFile.seekg(nextPos, std::ios::beg);
+			file.seekg(nextPos, std::ios::beg);
 		}
-		ioFile.seekg(0, std::ios::beg);
+		file.seekg(0, std::ios::beg);
 	}
-	ioFile.close();
+	file.close();
 }
 
 void File::SortByName() {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -558,43 +604,93 @@ void File::SortByName() {
 	int curPos, nextPos;
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
-			curPos = ioFile.tellg();
+			curPos = file.tellg();
 			GetElementOfBinFile(cur);
-			nextPos = ioFile.tellg();
+			nextPos = file.tellg();
 			GetElementOfBinFile(next);
 
 
 			if (std::strcmp(next.name.c_str(), cur.name.c_str()) < 0) {
-				ioFile.seekp(curPos, std::ios::beg);
+				file.seekp(curPos, std::ios::beg);
 
-				ioFile.write((char*)&next.team_num, sizeof(int));
-				ioFile.write((char*)&next.age, sizeof(int));
-				ioFile.write((char*)&next.weight, sizeof(double));
+				file.write((char*)&next.team_num, sizeof(int));
+				file.write((char*)&next.age, sizeof(int));
+				file.write((char*)&next.weight, sizeof(double));
 				int len = next.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(next.name.data(), len);
-				nextPos = ioFile.tellp();
+				file.write((char*)&len, sizeof(int));
+				file.write(next.name.data(), len);
+				nextPos = file.tellp();
 
-				ioFile.write((char*)&cur.team_num, sizeof(int));
-				ioFile.write((char*)&cur.age, sizeof(int));
-				ioFile.write((char*)&cur.weight, sizeof(double));
+				file.write((char*)&cur.team_num, sizeof(int));
+				file.write((char*)&cur.age, sizeof(int));
+				file.write((char*)&cur.weight, sizeof(double));
 				len = cur.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(cur.name.data(), len);
+				file.write((char*)&len, sizeof(int));
+				file.write(cur.name.data(), len);
 			}
-			ioFile.seekg(nextPos, std::ios::beg);
+			file.seekg(nextPos, std::ios::beg);
 		}
-		ioFile.seekg(0, std::ios::beg);
+		file.seekg(0, std::ios::beg);
 	}
-	ioFile.close();
+	file.close();
 }
 
-void File::SortByPrice() {
+void File::SortByName(string name) {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+		if (!file.is_open()) {
+			throw 4;
+		}
+	}
+	catch (int index) {
+		Exception ex(index);
+		ex.what();
+		return;
+	}
+
+	Competitor cur, next;
+	int curPos, nextPos;
+	for (int i = 0; i < fileSize; i++) {
+		for (int j = 0; j < fileSize - 1; j++) {
+			curPos = file.tellg();
+			GetElementOfBinFile(cur);
+			nextPos = file.tellg();
+			GetElementOfBinFile(next);
+
+
+			if ( cur.name.c_str()==name) {
+				file.seekp(curPos, std::ios::beg);
+
+				file.write((char*)&next.team_num, sizeof(int));
+				file.write((char*)&next.age, sizeof(int));
+				file.write((char*)&next.weight, sizeof(double));
+				int len = next.name.length();
+				file.write((char*)&len, sizeof(int));
+				file.write(next.name.data(), len);
+				nextPos = file.tellp();
+
+				file.write((char*)&cur.team_num, sizeof(int));
+				file.write((char*)&cur.age, sizeof(int));
+				file.write((char*)&cur.weight, sizeof(double));
+				len = cur.name.length();
+				file.write((char*)&len, sizeof(int));
+				file.write(cur.name.data(), len);
+			}
+			file.seekg(nextPos, std::ios::beg);
+		}
+		file.seekg(0, std::ios::beg);
+	}
+	file.close();
+}
+
+void File::sort_weight() {
+	int fileSize = CountElementOfBinFile();
+
+	try {
+		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -607,63 +703,62 @@ void File::SortByPrice() {
 	int curPos, nextPos;
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
-			curPos = ioFile.tellg();
+			curPos = file.tellg();
 			GetElementOfBinFile(cur);
-			nextPos = ioFile.tellg();
+			nextPos = file.tellg();
 			GetElementOfBinFile(next);
 
 			if (cur.weight > next.weight) {
-				ioFile.seekp(curPos, std::ios::beg);
+				file.seekp(curPos, std::ios::beg);
 
-				ioFile.write((char*)&next.team_num, sizeof(int));
-				ioFile.write((char*)&next.age, sizeof(int));
-				ioFile.write((char*)&next.weight, sizeof(double));
+				file.write((char*)&next.team_num, sizeof(int));
+				file.write((char*)&next.age, sizeof(int));
+				file.write((char*)&next.weight, sizeof(double));
 				int len = next.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(next.name.data(), len);
-				nextPos = ioFile.tellp();
+				file.write((char*)&len, sizeof(int));
+				file.write(next.name.data(), len);
+				nextPos = file.tellp();
 
-				ioFile.write((char*)&cur.team_num, sizeof(int));
-				ioFile.write((char*)&cur.age, sizeof(int));
-				ioFile.write((char*)&cur.weight, sizeof(double));
+				file.write((char*)&cur.team_num, sizeof(int));
+				file.write((char*)&cur.age, sizeof(int));
+				file.write((char*)&cur.weight, sizeof(double));
 				len = cur.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(cur.name.data(), len);
+				file.write((char*)&len, sizeof(int));
+				file.write(cur.name.data(), len);
 			}
-			ioFile.seekg(nextPos, std::ios::beg);
+			file.seekg(nextPos, std::ios::beg);
 		}
-		ioFile.seekg(0, std::ios::beg);
+		file.seekg(0, std::ios::beg);
 	}
-	ioFile.close();
+	file.close();
 }
 
-Competitor::Competitor(std::string name, int articul, int quantity, double price) {
+Competitor::Competitor(std::string name, int team_num, int age, double weight) {
 	this->name = name;
-	this->team_num = articul;
-	this->weight = price;
-	this->age = quantity;
+	this->team_num = team_num;
+	this->weight = weight;
+	this->age = age;
 }
 
-std::ostream& operator<<(std::ostream& out, const Competitor& shoes) {
-	out << "Name: " << shoes.name << std::endl;
-	out << "Number: " << shoes.team_num << std::endl;
-	out << "Weight: " << shoes.weight << std::endl;
-	out << "Age: " << shoes.age << std::endl;
+std::ostream& operator<<(std::ostream& out, const Competitor& comp) {
+	out << "Name: " << comp.name << std::endl;
+	out << "Number: " << comp.team_num << std::endl;
+	out << "Weight: " << comp.weight << std::endl;
+	out << "Age: " << comp.age << std::endl;
 	return out;
 }
 
-//File///////////////////
-File::File(std::string filePath) {
-	this->filePath = filePath;
-	ioFile.open(filePath, std::ios::out | std::ios::trunc);
-	ioFile.close();
+File::File(string path) {
+	this->path = path;
+	file.open(path, ios::out | ios::trunc);
+	file.close();
 }
 
 void File::ReadTextFormat() {
 
 	try {
-		ioFile.open(filePath, std::ios::in);
-		if (!ioFile.is_open()) {
+		file.open(path, ios::in);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -674,16 +769,16 @@ void File::ReadTextFormat() {
 	}
 
 	std::string data;
-	while (std::getline(ioFile, data)) {
+	while (std::getline(file, data)) {
 		std::cout << data << std::endl;
 	}
-	ioFile.close();
+	file.close();
 }
 
-void File::WriteTextFormat(const Competitor& shoes) {
+void File::WriteTextFormat(const Competitor& comp) {
 	try {
-		ioFile.open(filePath, std::ios::out | std::ios::app);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::out | std::ios::app);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -693,16 +788,16 @@ void File::WriteTextFormat(const Competitor& shoes) {
 		return;
 	}
 
-	ioFile << shoes;
-	ioFile.close();
+	file << comp;
+	file.close();
 }
 
-void File::FindByName(std::string name) {
+void File::FindByName(string name) {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, ios::in | ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -721,81 +816,64 @@ void File::FindByName(std::string name) {
 		}
 	}
 
-	ioFile.close();
+	file.close();
 }
 
-void File::DelByName(std::string name) {
-	int fileSize = CountElementOfBinFile();
 
-	try {
-		ioFile.open(filePath, std::ios::in | std::ios::out | std::ios::binary);
-		if (!ioFile.is_open()) {
-			throw 4;
-		}
-	}
-	catch (int index) {
-		Exception ex(index);
-		ex.what();
-		return;
-	}
-
-	Competitor cur, next;
-	int curPos, nextPos;
-	int size = 0;
-	for (int i = 0; i < fileSize; i++) {
-		curPos = ioFile.tellg();
-		GetElementOfBinFile(cur);
-		if (std::strcmp(cur.name.data(), name.data()) == 0) {
-			ioFile.seekg(curPos, std::ios::beg);
-			size = 0;
-			for (i; i < fileSize - 1; i++) {
-				curPos = ioFile.tellg();
-				GetElementOfBinFile(cur);
-				nextPos = ioFile.tellg();
-				GetElementOfBinFile(next);
-				size = curPos - nextPos;
-
-				ioFile.seekp(curPos, std::ios::beg);
-
-				ioFile.write((char*)&next.team_num, sizeof(int));
-				ioFile.write((char*)&next.age, sizeof(int));
-				ioFile.write((char*)&next.weight, sizeof(double));
-				int len = next.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(next.name.data(), len);
-				nextPos = ioFile.tellp();
-
-				ioFile.write((char*)&cur.team_num, sizeof(int));
-				ioFile.write((char*)&cur.age, sizeof(int));
-				ioFile.write((char*)&cur.weight, sizeof(double));
-				len = cur.name.length();
-				ioFile.write((char*)&len, sizeof(int));
-				ioFile.write(cur.name.data(), len);
-
-				ioFile.seekg(nextPos, std::ios::beg);
-			}
-
-			//chsize(_fileno(&ioFile), size);
-			
-		}
-	}
-	ioFile.close();
-	FILE* output;
-	fopen_s(&output, "B.bin", "wb");
-	//_chsize(_fileno(output), size);
-	fclose(output);
-	return;
-	//ioFile.close();
-	//chsize(_fileno(ioFile), size);
-	
-}
+//void File::DelByName(std::string name) {
+//	int fileSize = CountElementOfBinFile();
+//
+//	
+//	Competitor cur, next;
+//	int curPos, nextPos;
+//	for (int i = 1; i < fileSize; i++) {
+//		curPos = file.tellg();
+//		GetElementOfBinFile(cur);
+//		if (std::strcmp(cur.name.data(), name.data()) == 0) {
+//			file.seekg(curPos, std::ios::beg);
+//			int size = 0;
+//			for (i; i < fileSize - 1; i++) {
+//				curPos = file.tellg();
+//				GetElementOfBinFile(cur);
+//				nextPos = file.tellg();
+//				GetElementOfBinFile(next);
+//				size = curPos - nextPos;
+//
+//				file.seekp(curPos, std::ios::beg);
+//
+//				file.write((char*)&next.team_num, sizeof(int));
+//				file.write((char*)&next.age, sizeof(int));
+//				file.write((char*)&next.weight, sizeof(double));
+//				int len = next.name.length();
+//				file.write((char*)&len, sizeof(int));
+//				file.write(next.name.data(), len);
+//				nextPos = file.tellp();
+//
+//				file.write((char*)&cur.team_num, sizeof(int));
+//				file.write((char*)&cur.age, sizeof(int));
+//				file.write((char*)&cur.weight, sizeof(double));
+//				len = cur.name.length();
+//				file.write((char*)&len, sizeof(int));
+//				file.write(cur.name.data(), len);
+//
+//				file.seekg(nextPos, std::ios::beg);
+//			}
+//
+//			//chsize(_fileno(ioFile), size);
+//			file.close();
+//			return;
+//		}
+//	}
+//
+//	file.close();
+//}
 
 void File::ReadBinFormat() {
 	int fileSize = CountElementOfBinFile();
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -806,22 +884,21 @@ void File::ReadBinFormat() {
 	}
 
 	Competitor temp;
-	//for (int i = 0; i < fileSize; i++) {
-	ioFile.seekg(0, std::ios::end);
-	int size = ioFile.tellg();
-	ioFile.seekg(0, std::ios::beg);
-	while (ioFile.tellg() < size) {
+	file.seekg(0, ios::end);
+	int size = file.tellg();
+	file.seekg(0, std::ios::beg);
+	while (file.tellg() < size) {
 		GetElementOfBinFile(temp);
 		std::cout << temp << std::endl;
 	}
 
-	ioFile.close();
+	file.close();
 }
+void File::ReadBinFormat(int size) {
 
-void File::WriteBinFormat(const Competitor& shoes) {
 	try {
-		ioFile.open(filePath, std::ios::out | std::ios::app | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -831,34 +908,47 @@ void File::WriteBinFormat(const Competitor& shoes) {
 		return;
 	}
 
-	ioFile.write((char*)&shoes.team_num, sizeof(int));
-	ioFile.write((char*)&shoes.age, sizeof(int));
-	ioFile.write((char*)&shoes.weight, sizeof(double));
-	int len = shoes.name.length();
-	ioFile.write((char*)&len, sizeof(int));
-	ioFile.write(shoes.name.data(), len);
-	ioFile.close();
+	Competitor temp;
+	//file.seekg(0, ios::end);
+	//int size = file.tellg();
+	file.seekg(0, std::ios::beg);
+	while (file.tellg() < size) {
+		GetElementOfBinFile(temp);
+		std::cout << temp << std::endl;
+	}
+
+	file.close();
+}
+void File::WriteBinFormat(const Competitor& comp) {
+	try {
+		file.open(path, std::ios::out | std::ios::app | std::ios::binary);
+		if (!file.is_open()) {
+			throw 4;
+		}
+	}
+	catch (int index) {
+		Exception ex(index);
+		ex.what();
+		return;
+	}
+
+	file.write((char*)&comp.team_num, sizeof(int));
+	file.write((char*)&comp.age, sizeof(int));
+	file.write((char*)&comp.weight, sizeof(double));
+	int len = comp.name.length();
+	file.write((char*)&len, sizeof(int));
+	file.write(comp.name.data(), len);
+	file.close();
 }
 
-void File::GetElementOfBinFile(Competitor& temp) {
-	int len;
-	ioFile.read((char*)&temp.team_num, sizeof(int));
-	ioFile.read((char*)&temp.age, sizeof(int));
-	ioFile.read((char*)&temp.weight, sizeof(double));
-	ioFile.read((char*)&len, sizeof(int));
-	char* buf = new char[len + 1];
-	ioFile.read(buf, len);
-	buf[len] = 0;
-	temp.name = buf;
-	delete[] buf;
-}
+
 
 int File::CountElementOfBinFile() {
 	int size = 0;
 
 	try {
-		ioFile.open(filePath, std::ios::in | std::ios::binary);
-		if (!ioFile.is_open()) {
+		file.open(path, std::ios::in | std::ios::binary);
+		if (!file.is_open()) {
 			throw 4;
 		}
 	}
@@ -867,25 +957,16 @@ int File::CountElementOfBinFile() {
 		ex.what();
 		return 0;
 	}
-	ioFile.seekg(0, std::ios::end);
-	int fileSize = ioFile.tellg();
-	ioFile.seekg(0, std::ios::beg);
+	file.seekg(0, std::ios::end);
+	int fileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
 
-	while (ioFile.tellg() < fileSize) {
+	while (file.tellg() < fileSize) {
 		Competitor temp;
-		int len;
-		ioFile.read((char*)&temp.team_num, sizeof(int));
-		ioFile.read((char*)&temp.age, sizeof(int));
-		ioFile.read((char*)&temp.weight, sizeof(double));
-		ioFile.read((char*)&len, sizeof(int));
-		char* buf = new char[len + 1];
-		ioFile.read(buf, len);
-		buf[len] = 0;
-		temp.name = buf;
-		delete[] buf;
+		GetElementOfBinFile(temp);
 		size++;
 	}
 
-	ioFile.close();
+	file.close();
 	return size;
 }
