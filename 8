@@ -19,7 +19,12 @@ class Competitor {
 
 	friend File;
 public:
-	Competitor(string name, int articul, int quantuty, double price);
+	Competitor(string name, int team_num, int age, double weight) {
+		this->name = name;
+		this->team_num = team_num;
+		this->weight = weight;
+		this->age = age;
+	}
 	Competitor() {};
 	void PrintInfo() {
 		cout << "Name: " << name << endl;
@@ -81,7 +86,7 @@ public:
 	{
 		this->error = error;
 	}
-	void what()
+	void error_info()
 	{
 		if (error == 1)
 		{
@@ -103,9 +108,14 @@ public:
 		{
 			cout << "Ring is empty" << endl;
 		}
+		if (error == 6)
+		{
+			cout << "Nophing was founded" << endl;
+		}
 	} 	
 	void check_rerror(int error) {
 		this->error = error;
+		error_info();
 	}
 };
 
@@ -190,7 +200,7 @@ public:
 	}
 	void twice_output() {
 		if (size == 0)
-			throw Exception();
+			throw 5;
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < 2 * size)
@@ -226,7 +236,7 @@ public:
 	void begin()
 	{
 		if (size == 0)
-			throw 1;
+			throw 5;
 		if (current != 0)
 		{
 			while (current < size)
@@ -240,7 +250,7 @@ public:
 	}
 	void end() {
 		if (size == 0)
-			throw 1;
+			throw 5;
 		if (current != 0)
 		{
 			while (current < size)
@@ -254,7 +264,7 @@ public:
 	void search(T searched)
 	{
 		if (size == 0)
-			throw 1;
+			throw 5;
 		int i = 0;
 		while (i < size)
 		{
@@ -270,13 +280,13 @@ public:
 			node = node->getnexta();
 			i++;
 		}
-		std::cout << "\n Nothing was founded" << endl;
-		throw 2;
+		/*std::cout << "\n Nothing was founded" << endl;*/
+		throw 6;
 	}
 	Iterator& operator++()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 5;
 		if (size == 1)
 			current = 0;
 		else
@@ -289,12 +299,12 @@ public:
 	}
 	void operator = (T x)
 	{
-		if (size == 0) throw 1;
+		if (size == 0) throw 5;
 		node->data = x;
 	}
 	Iterator& operator[](int index)
 	{
-		if (size == 0) throw 1;
+		if (size == 0) throw 5;
 		if (index > size) throw 3;
 		Node<T>* tmp = node;
 		while (1)
@@ -337,21 +347,21 @@ public:
 class File {
 	string path;
 	fstream file;
-	int CountElementOfBinFile();
-	void GetElementOfBinFile(Competitor& comp);
+	int Count_el_amount();
+	
 public:
-	File(std::string filePath);
-	void ReadTextFormat();
-	void WriteTextFormat(const Competitor& comp);
-	void ReadBinFormat();
-	void ReadBinFormat(int);
-	void WriteBinFormat(const Competitor& comp);
+	File(string filePath);
+	void get_bin_el(Competitor& comp);
+	void text_read();
+	void write_text(const Competitor& comp);
+	void read_bin();
+	void read_bin(int);
+	void write_bin(const Competitor& comp);
 	void sort_weight();
 	void Num_sort();
 	void age_sort();
-	void SortByName();
-	void SortByName(string);
-	void InfoBeforePrice(double weight);
+	void name_sort();
+	bool name_sort(string);
 	int DelByName(string name);
 	void FindByName(string name);
 	
@@ -361,23 +371,24 @@ int main() {
 	File file1("T1.txt");
 	File file2("T2.txt");
 	File file3("B.bin");
+	Exception ex;
+	string name;
 
 	Ring<Competitor> ring;
-	ring.add(Competitor("Andrew", 2, 87, 35));
-	ring.add(Competitor("Nick", 1, 98, 25));
-	ring.add(Competitor("Mike", 1, 89, 30));
-	ring.add(Competitor("Alex", 12,105, 40));
-	ring.add(Competitor("Vova", 13, 100, 40));
-
+	ring.add(Competitor("Andrew", 2, 35, 87));
+	ring.add(Competitor("Nick", 1, 25, 98));
+	ring.add(Competitor("Mike", 1, 30, 89));
+	ring.add(Competitor("Alex", 12, 40, 105));
+	ring.add(Competitor("Vova", 13, 40, 100));
 	Iterator<Competitor> it(&ring);
 	int place = 0;
 	while (1) {
 		place++;
 		if (place==ring.get_size()) {
-			file1.WriteTextFormat(it.GetValue());
+			file1.write_text(it.GetValue());
 			break;
 		}
-		file1.WriteTextFormat(it.GetValue());
+		file1.write_text(it.GetValue());
 		++it;
 	}
 
@@ -386,10 +397,10 @@ int main() {
 	while (1) {
 		place++;
 		if (place == ring.get_size()) {
-			file2.WriteBinFormat(it.GetValue());
+			file2.write_bin(it.GetValue());
 			break;
 		}
-		file2.WriteBinFormat(it.GetValue());
+		file2.write_bin(it.GetValue());
 		++it;
 	}
 
@@ -398,39 +409,47 @@ int main() {
 	while (1) {
 		place++;
 		if (place == ring.get_size()) {
-			file3.WriteBinFormat(it.GetValue());
+			file3.write_bin(it.GetValue());
 			break;
 		}
-		file3.WriteBinFormat(it.GetValue());
+		file3.write_bin(it.GetValue());
 		++it;
 	}
 
-    std::cout << "Text File, Text format:\n" << "-------------------------\n";
-	//file1.ReadTextFormat();
-	//std::cout << "\nText File, bin format:\n" << "-------------------------\n";
-	//file2.ReadBinFormat();
-	std::cout << "Bin File:\n" << "-------------------------\n";
-	file3.ReadBinFormat();
-	/*file3.SortByName();
-	std::cout << "Sorted by name:\n" << "-------------------------\n";
+    cout <<endl << "Text text format:" <<endl;
+	file1.text_read();
+	cout <<endl<< "Text bin format:" <<endl;
+	file2.read_bin();
+	cout<<endl << "Bin File:" << endl;
+	file3.read_bin();
+	file3.name_sort();
+	cout<<endl << "After sorting by name:" <<endl;
 	file3.Num_sort();
-	file3.ReadBinFormat();
-	std::cout << "Sorted by num:\n" << "-------------------------\n";
-	file3.ReadBinFormat();
-	std::cout << "Find by name:\n" << "-------------------------\n";
-	file3.FindByName("Andrew");*/
-	int size=file3.DelByName("Mike");
+	file3.read_bin();
+	cout <<endl<< "After sorting by num:" << endl;
+	file3.read_bin();
+	try {
+		cout << endl << "Find watt? Input name pls" << endl;
+		getline(cin, name);
+		cout << endl << "Find by name:" << endl;
+	file3.FindByName(name);	 }
+	catch (int error_num) {
+		ex.check_rerror(error_num);	
+	}
+	system("pause");
+	int size;
+	size = file3.DelByName("Mike"); 
 	/*FILE* output;
 	fopen_s(&output, "B.bin", "wb");
 	_chsize(_fileno(output), 122);
 	fclose(output);*/
 	//File file4("B.bin");
-	std::cout << "del:\n" << "-------------------------\n";
-	file3.ReadBinFormat();
+	cout<<endl << "After deliting:" << endl;
+	file3.read_bin(size);
 	
 }
 
-void File::GetElementOfBinFile(Competitor& temp) {
+void File::get_bin_el(Competitor& temp) {
 	int len, beg;
 	file.read((char*)&temp.team_num, sizeof(int));
 	file.read((char*)&temp.age, sizeof(int));
@@ -444,31 +463,21 @@ void File::GetElementOfBinFile(Competitor& temp) {
 	delete[] nam;
 }
 int File::DelByName(string name) {
-	SortByName(name);
+	name_sort(name);
 	int size = 0, size2, size3;
-
-	try {
-		file.open(path, std::ios::in | std::ios::binary);
-		if (!file.is_open()) {
-			throw 4;
-		}
+    file.open(path, std::ios::in | std::ios::binary);
+    if (!file.is_open()) {
+		throw 4;
 	}
-	catch (int index) {
-		Exception ex(index);
-		ex.what();
-		return 0;
-	}
-	file.seekg(0, std::ios::end);
+	file.seekg(0, ios::end);
 	int fileSize = file.tellg();
-	file.seekg(0, std::ios::beg);
+	file.seekg(0, ios::beg);
 	Competitor next, next1;
-	
-	GetElementOfBinFile(next);
-	
+	get_bin_el(next);
 	while (file.tellg() < fileSize) {
 		
 		size2 = file.tellg();
-		GetElementOfBinFile(next1);
+		get_bin_el(next1);
 		size3 = file.tellg();
 		size++;
 	}
@@ -481,14 +490,12 @@ int File::DelByName(string name) {
 	}*/
 	//write(file, buf, 0);
 	file.close();
-
 	return size2;
-
-
 }
 
+
 void File::Num_sort() {
-	int fileSize = CountElementOfBinFile();
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -498,7 +505,7 @@ void File::Num_sort() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
@@ -507,9 +514,9 @@ void File::Num_sort() {
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
 			curPos = file.tellg();
-			GetElementOfBinFile(cur);
+			get_bin_el(cur);
 			nextPos = file.tellg();
-			GetElementOfBinFile(next);
+			get_bin_el(next);
 
 			if (cur.team_num > next.team_num) {
 				file.seekp(curPos, std::ios::beg);
@@ -537,7 +544,7 @@ void File::Num_sort() {
 }
 
 void File::age_sort() {
-	int fileSize = CountElementOfBinFile();
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -547,7 +554,7 @@ void File::age_sort() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 	Competitor cur, next;
@@ -555,9 +562,9 @@ void File::age_sort() {
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
 			curPos = file.tellg();
-			GetElementOfBinFile(cur);
+			get_bin_el(cur);
 			nextPos = file.tellg();
-			GetElementOfBinFile(next);
+			get_bin_el(next);
 
 
 			if (cur.age > next.age) {
@@ -585,8 +592,8 @@ void File::age_sort() {
 	file.close();
 }
 
-void File::SortByName() {
-	int fileSize = CountElementOfBinFile();
+void File::name_sort() {
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -596,7 +603,7 @@ void File::SortByName() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
@@ -605,9 +612,9 @@ void File::SortByName() {
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
 			curPos = file.tellg();
-			GetElementOfBinFile(cur);
+			get_bin_el(cur);
 			nextPos = file.tellg();
-			GetElementOfBinFile(next);
+			get_bin_el(next);
 
 
 			if (std::strcmp(next.name.c_str(), cur.name.c_str()) < 0) {
@@ -635,9 +642,9 @@ void File::SortByName() {
 	file.close();
 }
 
-void File::SortByName(string name) {
-	int fileSize = CountElementOfBinFile();
-
+bool File::name_sort(string name) {
+	int fileSize = Count_el_amount();
+	bool exicst = false;
 	try {
 		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
 		if (!file.is_open()) {
@@ -646,8 +653,8 @@ void File::SortByName(string name) {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
-		return;
+		ex.error_info();
+		return false;
 	}
 
 	Competitor cur, next;
@@ -655,12 +662,13 @@ void File::SortByName(string name) {
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
 			curPos = file.tellg();
-			GetElementOfBinFile(cur);
+			get_bin_el(cur);
 			nextPos = file.tellg();
-			GetElementOfBinFile(next);
+			get_bin_el(next);
 
 
 			if ( cur.name.c_str()==name) {
+				exicst = true;
 				file.seekp(curPos, std::ios::beg);
 
 				file.write((char*)&next.team_num, sizeof(int));
@@ -683,10 +691,11 @@ void File::SortByName(string name) {
 		file.seekg(0, std::ios::beg);
 	}
 	file.close();
+	return exicst;
 }
 
 void File::sort_weight() {
-	int fileSize = CountElementOfBinFile();
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -696,7 +705,7 @@ void File::sort_weight() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 	Competitor cur, next;
@@ -704,9 +713,9 @@ void File::sort_weight() {
 	for (int i = 0; i < fileSize; i++) {
 		for (int j = 0; j < fileSize - 1; j++) {
 			curPos = file.tellg();
-			GetElementOfBinFile(cur);
+			get_bin_el(cur);
 			nextPos = file.tellg();
-			GetElementOfBinFile(next);
+			get_bin_el(next);
 
 			if (cur.weight > next.weight) {
 				file.seekp(curPos, std::ios::beg);
@@ -733,12 +742,6 @@ void File::sort_weight() {
 	file.close();
 }
 
-Competitor::Competitor(std::string name, int team_num, int age, double weight) {
-	this->name = name;
-	this->team_num = team_num;
-	this->weight = weight;
-	this->age = age;
-}
 
 std::ostream& operator<<(std::ostream& out, const Competitor& comp) {
 	out << "Name: " << comp.name << std::endl;
@@ -754,7 +757,7 @@ File::File(string path) {
 	file.close();
 }
 
-void File::ReadTextFormat() {
+void File::text_read() {
 
 	try {
 		file.open(path, ios::in);
@@ -764,7 +767,7 @@ void File::ReadTextFormat() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
@@ -775,7 +778,7 @@ void File::ReadTextFormat() {
 	file.close();
 }
 
-void File::WriteTextFormat(const Competitor& comp) {
+void File::write_text(const Competitor& comp) {
 	try {
 		file.open(path, std::ios::out | std::ios::app);
 		if (!file.is_open()) {
@@ -784,7 +787,7 @@ void File::WriteTextFormat(const Competitor& comp) {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
@@ -793,7 +796,7 @@ void File::WriteTextFormat(const Competitor& comp) {
 }
 
 void File::FindByName(string name) {
-	int fileSize = CountElementOfBinFile();
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, ios::in | ios::binary);
@@ -803,13 +806,13 @@ void File::FindByName(string name) {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
 	Competitor temp;
 	for (int i = 0; i < fileSize; i++) {
-		GetElementOfBinFile(temp);
+		get_bin_el(temp);
 		if (std::strcmp(temp.name.data(), name.data()) == 0) {
 			std::cout << temp << std::endl;
 			return;
@@ -817,59 +820,13 @@ void File::FindByName(string name) {
 	}
 
 	file.close();
+	throw 6;
 }
 
 
-//void File::DelByName(std::string name) {
-//	int fileSize = CountElementOfBinFile();
-//
-//	
-//	Competitor cur, next;
-//	int curPos, nextPos;
-//	for (int i = 1; i < fileSize; i++) {
-//		curPos = file.tellg();
-//		GetElementOfBinFile(cur);
-//		if (std::strcmp(cur.name.data(), name.data()) == 0) {
-//			file.seekg(curPos, std::ios::beg);
-//			int size = 0;
-//			for (i; i < fileSize - 1; i++) {
-//				curPos = file.tellg();
-//				GetElementOfBinFile(cur);
-//				nextPos = file.tellg();
-//				GetElementOfBinFile(next);
-//				size = curPos - nextPos;
-//
-//				file.seekp(curPos, std::ios::beg);
-//
-//				file.write((char*)&next.team_num, sizeof(int));
-//				file.write((char*)&next.age, sizeof(int));
-//				file.write((char*)&next.weight, sizeof(double));
-//				int len = next.name.length();
-//				file.write((char*)&len, sizeof(int));
-//				file.write(next.name.data(), len);
-//				nextPos = file.tellp();
-//
-//				file.write((char*)&cur.team_num, sizeof(int));
-//				file.write((char*)&cur.age, sizeof(int));
-//				file.write((char*)&cur.weight, sizeof(double));
-//				len = cur.name.length();
-//				file.write((char*)&len, sizeof(int));
-//				file.write(cur.name.data(), len);
-//
-//				file.seekg(nextPos, std::ios::beg);
-//			}
-//
-//			//chsize(_fileno(ioFile), size);
-//			file.close();
-//			return;
-//		}
-//	}
-//
-//	file.close();
-//}
 
-void File::ReadBinFormat() {
-	int fileSize = CountElementOfBinFile();
+void File::read_bin() {
+	int fileSize = Count_el_amount();
 
 	try {
 		file.open(path, std::ios::in | std::ios::binary);
@@ -879,47 +836,45 @@ void File::ReadBinFormat() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
 	Competitor temp;
 	file.seekg(0, ios::end);
 	int size = file.tellg();
-	file.seekg(0, std::ios::beg);
+	file.seekg(0, ios::beg);
 	while (file.tellg() < size) {
-		GetElementOfBinFile(temp);
+		get_bin_el(temp);
 		std::cout << temp << std::endl;
 	}
 
 	file.close();
 }
-void File::ReadBinFormat(int size) {
+void File::read_bin(int size) {
 
 	try {
-		file.open(path, std::ios::in | std::ios::binary);
+		file.open(path, ios::in | ios::binary);
 		if (!file.is_open()) {
 			throw 4;
 		}
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
 	Competitor temp;
-	//file.seekg(0, ios::end);
-	//int size = file.tellg();
 	file.seekg(0, std::ios::beg);
 	while (file.tellg() < size) {
-		GetElementOfBinFile(temp);
+		get_bin_el(temp);
 		std::cout << temp << std::endl;
 	}
 
 	file.close();
 }
-void File::WriteBinFormat(const Competitor& comp) {
+void File::write_bin(const Competitor& comp) {
 	try {
 		file.open(path, std::ios::out | std::ios::app | std::ios::binary);
 		if (!file.is_open()) {
@@ -928,7 +883,7 @@ void File::WriteBinFormat(const Competitor& comp) {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return;
 	}
 
@@ -943,7 +898,7 @@ void File::WriteBinFormat(const Competitor& comp) {
 
 
 
-int File::CountElementOfBinFile() {
+int File::Count_el_amount() {
 	int size = 0;
 
 	try {
@@ -954,7 +909,7 @@ int File::CountElementOfBinFile() {
 	}
 	catch (int index) {
 		Exception ex(index);
-		ex.what();
+		ex.error_info();
 		return 0;
 	}
 	file.seekg(0, std::ios::end);
@@ -963,7 +918,7 @@ int File::CountElementOfBinFile() {
 
 	while (file.tellg() < fileSize) {
 		Competitor temp;
-		GetElementOfBinFile(temp);
+		get_bin_el(temp);
 		size++;
 	}
 
