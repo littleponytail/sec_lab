@@ -359,8 +359,6 @@ int main()
 		Exception ex(error_number);
 		
 	}
-
-
 	ring.add(ctask("First task", 3.4));
 	ring.add(ctask("Second task", 5.6));
 	ring.add(ctask("Third task", 7.8));
@@ -369,16 +367,10 @@ int main()
 	Iterator<ctask> I(&ring);
 	Exception ex1;
 	string name;
-
-
-
 	try
 	{
 		ring.output();
-
-		
 		cout << "\nAfter sorting" << endl;
-
 		I.begin();
 		I.shell();
 		ring.output();
