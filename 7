@@ -15,9 +15,9 @@ public:
 	Exception(int error)
 	{
 		this->error = error;
-		what();
+		error_info();
 	}
-	void what()
+	void error_info()
 	{
 		if (error == 1)
 		{
@@ -31,6 +31,10 @@ public:
 		{
 			std::cout << "pointer is empty" << std::endl;
 		}
+	}
+	void check_rerror(int error) {
+		this->error = error;
+		error_info();
 	}
 };
 
@@ -142,7 +146,6 @@ public:
 		Node<T>* tmp = head;
 		head = head->getnexta();
 		delete tmp;
-		size--;
 		Node<T>* t = head;
 		int i = 0;
 		while (i < size - 1)
@@ -168,7 +171,7 @@ public:
 	}
 	void twice_output() {
 		if (size == 0)
-			throw 1;
+			throw Exception();
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < 2*size)
@@ -184,7 +187,9 @@ public:
 	int get_size() {
 		return size;
 	}
-
+	void del() {
+		size--;
+	}
 };
 
 template<class T>
@@ -205,9 +210,9 @@ public:
 	{
 		if (size == 0)
 			throw 1;
-		if (current != 0)
+		if (current!=0)
 		{
-			while (current < size-1)
+			while (current < size)
 			{
 				current++;
 				node = node->getnexta();
@@ -216,6 +221,20 @@ public:
 		}
 
 	}
+	void end() {
+		if (size == 0)
+			throw 1;
+		if (current != 0)
+		{
+			while (current < size)
+			{
+				current++;
+				node = node->getnexta();
+			}
+			current = size-1;
+		}
+	}
+	
 	void search(T searched)
 	{
 		if (size == 0)
@@ -223,7 +242,7 @@ public:
 		int i = 0;
 		while (i < size)
 		{
-			if (!(searched > node->data) && !(searched < node->data))
+			if (searched == node->data)
 			{
 				cout << "\nHere it is\n " << node->data <<endl;
 				return;
@@ -231,10 +250,11 @@ public:
 			if (current == size - 1)
 				current = 0;
 			else
-		        current++;
+		    current++;
 			node = node->getnexta();
 			i++;
 		}
+	
 		throw 2;
 	}
 	Iterator& operator++()
@@ -279,7 +299,7 @@ public:
 	{
 		T temp;
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		int step, i, j;
 		for (step = size / 2; step > 0; step /= 2)
 			for (i = step; i < size; i++)
@@ -289,6 +309,39 @@ public:
 					(*this)[j].node->getnexta()->data = ((*this)[j + step]).node->getnexta()->data;
 					(*this)[j + step].node->getnexta()->data = temp;
 				}
+	}
+	int namedelete(T searched)
+	{
+		if (size == 0) throw 1;
+		Node<T>* pred=node;
+		int pred_num=0;
+		int i = 0;
+		while (i < size)
+		{
+			if (!(searched > node->data) && !(searched < node->data))
+			{
+				if (current == 0)	 return 0;
+				else {
+					pred->setnexta(node->getnexta());
+					size--;
+					Node<T>* temp = node;
+					this->node = pred;
+					delete temp;
+					return 1;
+				}
+			
+			}
+			if (current == size - 1)
+				current = 0;
+			else
+		    pred_num = current;
+			current++;
+			pred = node;
+			node = node->getnexta();
+			i++;
+		}
+
+		return -1;
 	}
 };
 
@@ -302,9 +355,9 @@ int main()
 	{
 		ring.mydelete();
 	}
-	catch (int exIndex) {
-		Exception ex(exIndex);
-		ex.what();
+	catch (int error_number) {
+		Exception ex(error_number);
+		
 	}
 
 
@@ -313,45 +366,87 @@ int main()
 	ring.add(ctask("Third task", 7.8));
 	ring.add(ctask("Fourth task", 9.8));
 	ring.add(ctask("Fifth task", 5.0));
+	Iterator<ctask> I(&ring);
+	Exception ex1;
+	string name;
+
+
+
 	try
 	{
 		ring.output();
-	
-		Iterator<ctask> I(&ring);
-		cout << "\nAfter sorting"  << endl;
+
+		
+		cout << "\nAfter sorting" << endl;
 
 		I.begin();
 		I.shell();
 		ring.output();
 
-		cout << "\nAfter deleting the first" << endl;
 	
-		ring.mydelete();
-		ring.output();
-	
+	}
+    catch (int error_number)
+	{
+		    ex1.check_rerror(error_number);
+			
+	}
+	try {
 		cout << "\nAfter deleting the first" << endl;
 		ring.mydelete();
+		ring.del();
 		ring.output();
+	}
+	catch (int error_number)
+	{
+		ex1.check_rerror(error_number);
+	
+	}
+	
+	try {
 		
+		cout << endl << "dilite watt? Input name of the task" << endl;
+		getline(cin, name);
+		int res= I.namedelete(name);
+		if (res == 0) { ring.mydelete(); ring.del();
+		}
+		else if(res==-1) cout << endl << "Nophing was founded" << endl;
+		else ring.del();
+		cout << "\nAfter deleting" << endl;
+		ring.output();
 		I.begin();
-		string name;
-		cout << "find watt? Input name of the task"<<endl;
+	}
+
+	catch (int error_number)
+	{
+		ex1.check_rerror(error_number);
+
+	}
+	try {
+		
+		cout << endl << "find watt? Input name of the task" << endl;
 		getline(cin, name);
 		I.search(ctask(name));
+	}
+	catch (int error_number) {
+		ex1.check_rerror(error_number);
+		
+	}
+	try{
 		cout <<endl << "find watt? Input name of the task"<<endl;
 		getline(cin, name);
 		I.search(ctask(name));
 	}
-	catch (int exIndex) {
-		Exception ex1(exIndex);
-		ex1.what();
+	catch (int error_number) {
+		ex1.check_rerror(error_number);
+		
 	}
+	system("pause");
 	try
 	{
 		ring.twice_output();
 	}
-	catch (int exIndex) {
-		Exception ex1(exIndex);
-		ex1.what();
+	catch (int error_number) {
+		ex1.check_rerror(error_number);
+		
 	}
 }
