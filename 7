@@ -168,7 +168,7 @@ public:
 	}
 	void twice_output() {
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < 2*size)
@@ -231,17 +231,16 @@ public:
 			if (current == size - 1)
 				current = 0;
 			else
-		    current++;
+		        current++;
 			node = node->getnexta();
 			i++;
 		}
-		cout << "\n Nothing was founded" << endl;
 		throw 2;
 	}
 	Iterator& operator++()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		if (size == 1)
 			current = 0;
 		else
