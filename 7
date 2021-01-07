@@ -42,12 +42,12 @@ class ctask
 {
 private:
 	static int default_id;
-    int id;
+	int id;
 	string name;
 	float rate;
 public:
 
-	ctask(string name, float rate) 
+	ctask(string name, float rate)
 	{
 		default_id++;
 		this->id = default_id;
@@ -60,7 +60,7 @@ public:
 		default_id++;
 		id = default_id;
 		name = "Task";
-		rate=0.0;
+		rate = 0.0;
 	}
 
 	ctask(string nname) {
@@ -69,18 +69,19 @@ public:
 		this->id = default_id;
 		rate = 0.0;
 	}
-	
-	void output(){cout << "\nId - " << id << "\nName - " << name << "\nRate - " << rate << endl;}
 
-	bool operator< (ctask& c2) const
+	void output() { cout << "\nId - " << id << "\nName - " << name << "\nRate - " << rate << endl; }
+
+	bool operator< (ctask& c2)
 	{
-		if (name < c2.name)   return true;
+		if (name < c2.name/* || (name[0] < c2.name[0] && name.length() == c2.name.length())*/) return true;
 		else return false;
+
 	}
-	bool operator> (ctask& c2) const
+	bool operator> (ctask& c2)
 	{
-		if (name > c2.name)   return true;
-		else return false;
+		if ((c2.name.length()==name.length()&&c2.name[0]>name[0])|| name < c2.name ) return false;
+		else return true;
 	}
 
 	bool operator== (ctask& c2) {
@@ -91,17 +92,19 @@ public:
 	friend ostream& operator<<(ostream& out, const ctask c);
 };
 int ctask::default_id = 0;
-ostream& operator<<(ostream& out, const ctask c){cout << "\nId - " << c.id << "\nName - " << c.name << "\nRate - " << c.rate << endl;
-return out;
+ostream& operator<<(ostream & out, const ctask c) {
+	cout << "\nId - " << c.id << "\nName - " << c.name << "\nRate - " << c.rate << endl;
+	return out;
 }
 
 
 template <typename T>
 class  Node
 {
+
 	
-	Node* nexta;
 public:
+	Node* nexta;
 	Node* getnexta() {
 		return nexta;
 	};
@@ -141,25 +144,25 @@ public:
 	}
 	void mydelete()
 	{
-		if (size == 0)
-			throw 1;
+		if (size == 0)	throw 1;
 		Node<T>* tmp = head;
-		head = head->getnexta();
+		head = head->nexta;
 		delete tmp;
+		size--;
 		Node<T>* t = head;
 		int i = 0;
 		while (i < size - 1)
 		{
-			t = t->getnexta();
+			t = t->nexta;
 			i++;
 		}
-		t->setnexta (head);
+		t->nexta = head;
 
 	}
 	void output()
 	{
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		Node<T>* temp = head;
 		int i = 0;
 		while (i < size)
@@ -171,10 +174,10 @@ public:
 	}
 	void twice_output() {
 		if (size == 0)
-			throw Exception();
+			throw 1;
 		Node<T>* temp = head;
 		int i = 0;
-		while (i < 2*size)
+		while (i < 2 * size)
 		{
 			cout << "   " << temp->data;
 			temp = temp->getnexta();
@@ -210,7 +213,7 @@ public:
 	{
 		if (size == 0)
 			throw 1;
-		if (current!=0)
+		if (current != 0)
 		{
 			while (current < size)
 			{
@@ -231,10 +234,10 @@ public:
 				current++;
 				node = node->getnexta();
 			}
-			current = size-1;
+			current = size - 1;
 		}
 	}
-	
+
 	void search(T searched)
 	{
 		if (size == 0)
@@ -244,17 +247,17 @@ public:
 		{
 			if (searched == node->data)
 			{
-				cout << "\nHere it is\n " << node->data <<endl;
+				cout << "\nHere it is\n " << node->data << endl;
 				return;
 			}
 			if (current == size - 1)
 				current = 0;
 			else
-		    current++;
+				current++;
 			node = node->getnexta();
 			i++;
 		}
-	
+
 		throw 2;
 	}
 	Iterator& operator++()
@@ -301,26 +304,35 @@ public:
 		if (size == 0)
 			throw 1;
 		int step, i, j;
-		for (step = size / 2; step > 0; step /= 2)
-			for (i = step; i < size; i++)
-				for (j = i - step; j >= 0 && (*this)[j].node->getnexta()->data > ((*this)[j + step]).node->getnexta()->data; j -= step)
+		for (step = size / 2; step > 0; step /= 2) {
+			this->begin();
+			for (i = step; i < size; i++) {
+				this->begin();
+				for (j = i - step; j >= 0 && (*this)[j].node->data >((*this)[j + step]).node->data; j -= step)
 				{
-					temp = (*this)[j].node->getnexta()->data;
-					(*this)[j].node->getnexta()->data = ((*this)[j + step]).node->getnexta()->data;
-					(*this)[j + step].node->getnexta()->data = temp;
+					this->begin();
+					temp = (*this)[j].node->data;
+					(*this)[j].node->data = ((*this)[j + step]).node->data;
+					(*this)[j + step].node->data = temp;
 				}
+			}
+		}
+	
 	}
+	
 	int namedelete(T searched)
 	{
 		if (size == 0) throw 1;
-		Node<T>* pred=node;
-		int pred_num=0;
+		Node<T>* pred = node;
+		int pred_num = 0;
 		int i = 0;
 		while (i < size)
 		{
-			if (!(searched > node->data) && !(searched < node->data))
+			if (searched== node->data)
 			{
-				if (current == 0)	 return 0;
+				if (current == 0) {
+					return 0;
+				}
 				else {
 					pred->setnexta(node->getnexta());
 					size--;
@@ -329,12 +341,12 @@ public:
 					delete temp;
 					return 1;
 				}
-			
+
 			}
 			if (current == size - 1)
 				current = 0;
 			else
-		    pred_num = current;
+				pred_num = current;
 			current++;
 			pred = node;
 			node = node->getnexta();
@@ -357,7 +369,7 @@ int main()
 	}
 	catch (int error_number) {
 		Exception ex(error_number);
-		
+
 	}
 	ring.add(ctask("First task", 3.4));
 	ring.add(ctask("Second task", 5.6));
@@ -366,7 +378,7 @@ int main()
 	ring.add(ctask("Fifth task", 5.0));
 	Iterator<ctask> I(&ring);
 	Exception ex1;
-	string name;
+	string name, name2, name3;
 	try
 	{
 		ring.output();
@@ -375,33 +387,25 @@ int main()
 		I.shell();
 		ring.output();
 
-	
-	}
-    catch (int error_number)
-	{
-		    ex1.check_rerror(error_number);
-			
-	}
-	try {
-		cout << "\nAfter deleting the first" << endl;
-		ring.mydelete();
-		ring.del();
-		ring.output();
+
 	}
 	catch (int error_number)
 	{
 		ex1.check_rerror(error_number);
-	
+
 	}
-	
+
 	try {
-		
+		I.begin();
 		cout << endl << "dilite watt? Input name of the task" << endl;
 		getline(cin, name);
-		int res= I.namedelete(name);
-		if (res == 0) { ring.mydelete(); ring.del();
+		int res = I.namedelete(name);
+		if (res == 0) {
+			I.begin();
+			ring.mydelete();
+
 		}
-		else if(res==-1) cout << endl << "Nophing was founded" << endl;
+		else if (res == -1) cout << endl << "Nophing was founded" << endl;
 		else ring.del();
 		cout << "\nAfter deleting" << endl;
 		ring.output();
@@ -413,24 +417,26 @@ int main()
 		ex1.check_rerror(error_number);
 
 	}
+	Iterator<ctask> I1(&ring);
 	try {
 		
+		I.begin();
 		cout << endl << "find watt? Input name of the task" << endl;
-		getline(cin, name);
-		I.search(ctask(name));
+		getline(cin, name2);
+		I1.search(ctask(name2));
 	}
 	catch (int error_number) {
 		ex1.check_rerror(error_number);
-		
+
 	}
-	try{
-		cout <<endl << "find watt? Input name of the task"<<endl;
-		getline(cin, name);
-		I.search(ctask(name));
+	try {
+		cout << endl << "find watt? Input name of the task" << endl;
+		getline(cin, name3);
+		I1.search(ctask(name3));
 	}
 	catch (int error_number) {
 		ex1.check_rerror(error_number);
-		
+
 	}
 	system("pause");
 	try
@@ -439,6 +445,9 @@ int main()
 	}
 	catch (int error_number) {
 		ex1.check_rerror(error_number);
-		
+
 	}
+	bool show = "Third task" > "First task";
+	cout << endl <<show << endl;
 }
+
